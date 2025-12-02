@@ -2,6 +2,10 @@ from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Relationship
 from pydantic import field_validator
 
+# =================================================================================
+#    Sensor model
+# =================================================================================
+
 class SensorBase(SQLModel):
     name: str
     status: str
@@ -16,6 +20,10 @@ class SensorDb(SensorBase, table=True):
     segment: 'SegmentDb' | None = Relationship(back_populates='sensors')
     status_history: list['SensorStatusDb'] = Relationship(back_populates='sensor')
 
+# =================================================================================
+#    Sensor status model
+# =================================================================================
+
 class SensorStatusBase(SQLModel):
     status: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -27,6 +35,10 @@ class SensorStatusDb(SensorStatusBase, table=True):
     id: int = Field(default=None, primary_key=True)
     sensor_id: int = Field(default=None, foreign_key='sensordb.id', nullable=False)
     sensor: SensorDb | None = Relationship(back_populates='status_history')
+
+# =================================================================================
+#    Measurement model
+# =================================================================================
 
 class MeasurementBase(SQLModel):
     temperature: float
@@ -44,6 +56,10 @@ class MeasurementDb(MeasurementBase, table=True):
     id: int = Field(default=None, primary_key=True)
     sensor_id: int = Field(default=None, foreign_key='sensordb.id')
     sensor: SensorDb | None = Relationship(back_populates='measurements')
+
+# =================================================================================
+#    Segment model
+# =================================================================================
 
 class SegmentBase(SQLModel):
     name: str
