@@ -1,28 +1,37 @@
+from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Relationship
 
 class SensorBase(SQLModel):
-    pass
+    name: str
+    status: str
 
 class SensorIn(SensorBase):
     pass
 
 class SensorDb(SensorBase, table=True):
-    pass
+    id: int = Field(default=None, primary_key=True)
+    segment_id: int = Field(nullable=False, foreign_key='segmentdb.id')
+    measurements: list['MeasurementDb'] = Relationship(back_populates='sensor')
+    segment: 'SegmentDb' | None = Relationship(back_populates='sensors')
 
 class MeasurementBase(SQLModel):
-    pass
+    measurement: float
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class MeasurementIn(MeasurementBase):
     pass
 
 class MeasurementDb(MeasurementBase, table=True):
-    pass
+    id: int = Field(default=None, primary_key=True)
+    sensor_id: int = Field(default=None, foreign_key='sensordb.id')
+    sensor: SensorDb | None = Relationship(back_populates='measurements')
 
 class SegmentBase(SQLModel):
-    pass
+    name: str
 
 class SegmentIn(SegmentBase):
     pass
 
 class SegmentDb(SegmentBase, table=True):
-    pass
+    id: int = Field(default=None, primary_key=True)
+    sensors: list['SensorDb'] = Relationship(back_populates='segment')
