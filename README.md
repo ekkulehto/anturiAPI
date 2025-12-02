@@ -30,6 +30,6 @@ ajanhetkille)
 
 ## Lohkot
 
-- Sisältää antureita
+- Sisältää vähintään yhden (1) anturin
 - Antureilla tunniste, tila sekä viimeisin mitta-arvo ja sen
 aikaleima
