@@ -16,13 +16,13 @@ class SensorDb(SensorBase, table=True):
     segment: 'SegmentDb' | None = Relationship(back_populates='sensors')
 
 class MeasurementBase(SQLModel):
-    measurement: float
+    temperature: float
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    @field_validator('measurement')
+    @field_validator('temperature')
     @classmethod
-    def round_measurement_to_one_decimal(cls, measurement: float) -> float:
-        return round(measurement, 1)
+    def round_temperature_to_one_decimal(cls, temperature: float) -> float:
+        return round(temperature, 1)
 
 class MeasurementIn(MeasurementBase):
     pass
