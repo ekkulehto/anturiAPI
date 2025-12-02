@@ -9,6 +9,15 @@ class SensorIn(SensorBase):
 class SensorDb(SensorBase, table=True):
     pass
 
+class MeasurementBase(SQLModel):
+    pass
+
+class MeasurementIn(MeasurementBase):
+    pass
+
+class MeasurementDb(MeasurementBase, table=True):
+    pass
+
 class SegmentBase(SQLModel):
     pass
 
