@@ -11,7 +11,7 @@ class SensorIn(SensorBase):
 
 class SensorDb(SensorBase, table=True):
     id: int = Field(default=None, primary_key=True)
-    segment_id: int = Field(nullable=False, foreign_key='segmentdb.id')
+    segment_id: int = Field(default=None, foreign_key='segmentdb.id', nullable=False)
     measurements: list['MeasurementDb'] = Relationship(back_populates='sensor')
     segment: 'SegmentDb' | None = Relationship(back_populates='sensors')
 
