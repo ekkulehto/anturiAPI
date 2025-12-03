@@ -3,7 +3,7 @@ from sqlmodel import Session
 from ..database.database import get_session
 
 from ..database import segments_crud as crud
-from ..database.models import SegmentIn, SegmentDb
+from ..database.models import SegmentIn, SegmentDb, SegmentOut
 
 router = APIRouter(prefix='/segments', tags=['segments'])
 
@@ -11,7 +11,7 @@ router = APIRouter(prefix='/segments', tags=['segments'])
 def get_all_segments(*, session: Session = Depends(get_session)):
     return crud.get_all_segments(session)
 
-@router.get('/{segment_id}', response_model=SegmentDb)
+@router.get('/{segment_id}', response_model=SegmentOut)
 def get_segment_by_id(*, session: Session = Depends(get_session), segment_id: int):
     return crud.get_segment_by_id(session, segment_id)
 
