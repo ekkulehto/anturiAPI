@@ -11,7 +11,7 @@ router = APIRouter(prefix='/segments', tags=['segments'])
 def get_all_measurements(*, session: Session = Depends(get_session)):
     return crud.get_all_measurements(session)
 
-@router.get('/{sensor_id}', response_model=MeasurementDb)
+@router.get('/{measurement_id}', response_model=MeasurementDb)
 def get_measurement_by_id(*, session: Session = Depends(get_session), measurement_id: int):
     return crud.get_measurement_by_id(session, measurement_id)
 
@@ -19,6 +19,6 @@ def get_measurement_by_id(*, session: Session = Depends(get_session), measuremen
 def create_measurement(*, session: Session = Depends(get_session), measurement_in: MeasurementIn):
     return crud.create_measurement(session, measurement_in)
 
-@router.delete("/{pub_id}", response_model=MeasurementDb)
+@router.delete("/{measurement_id}", response_model=MeasurementDb)
 def delete_measurement_by_id(*, session: Session = Depends(get_session), measurement_id: int):
     return crud.delete_measurement_by_id(session, measurement_id)
