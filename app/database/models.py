@@ -14,6 +14,7 @@ class SensorStatus(str, Enum):
 
 class SensorBase(SQLModel):
     name: str
+    segment_id: int
 
 class SensorIn(SensorBase):
     pass
@@ -21,7 +22,7 @@ class SensorIn(SensorBase):
 class SensorDb(SensorBase, table=True):
     id: int = Field(default=None, primary_key=True)
     status: SensorStatus = SensorStatus.NORMAL
-    segment_id: int = Field(default=None, foreign_key='segmentdb.id', nullable=False)
+    segment_id: int = Field(foreign_key='segmentdb.id', nullable=False)
     measurements: list['MeasurementDb'] = Relationship(back_populates='sensor')
     segment: Optional['SegmentDb'] = Relationship(back_populates='sensors')
     status_history: list['SensorStatusDb'] = Relationship(back_populates='sensor')
