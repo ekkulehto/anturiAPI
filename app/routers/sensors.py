@@ -3,15 +3,15 @@ from sqlmodel import Session
 from ..database.database import get_session
 
 from ..database import sensors_crud as crud
-from ..database.models import SensorIn, SensorDb
+from ..database.models import SensorIn, SensorDb, SensorOut
 
 router = APIRouter(prefix='/sensors', tags=['sensors'])
 
-@router.get('', response_model=list[SensorDb])
+@router.get('', response_model=list[SensorOut])
 def get_all_sensors(*, session: Session = Depends(get_session)):
     return crud.get_all_sensors(session)
 
-@router.get('/{sensor_id}', response_model=SensorDb)
+@router.get('/{sensor_id}', response_model=SensorOut)
 def get_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int):
     return crud.get_sensor_by_id(session, sensor_id)
 
