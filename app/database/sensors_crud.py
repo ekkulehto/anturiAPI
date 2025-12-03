@@ -1,8 +1,9 @@
+from datetime import datetime, timezone
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
 from ..schemas.filters import MeasurementFilter
-from .models import MeasurementDb, MeasurementOut, SegmentDb, SensorIn, SensorDb, SensorOutWithMeasurements
+from .models import MeasurementDb, MeasurementOut, SegmentDb, SensorIn, SensorDb, SensorOutWithMeasurements, SensorStatus, SensorStatusDb
 
 def create_sensor(session: Session, sensor_in: SensorIn):
     segment = session.get(SegmentDb, sensor_in.segment_id)
@@ -12,12 +13,17 @@ def create_sensor(session: Session, sensor_in: SensorIn):
             detail='Segment not found',
             status_code=status.HTTP_404_NOT_FOUND
         )
+    
+    new_sensor = SensorDb.model_validate(sensor_in)
 
-    sensor = SensorDb.model_validate(sensor_in)
-    session.add(sensor)
+    sensor_status = SensorStatusDb(status=SensorStatus.NORMAL ,sensor=new_sensor)
+    
+    session.add(new_sensor)
+    session.add(sensor_status)
     session.commit()
-    session.refresh(sensor)
-    return sensor
+    session.refresh(new_sensor)
+
+    return new_sensor
 
 def get_all_sensors(session: Session):
     return session.exec(select(SensorDb)).all()
