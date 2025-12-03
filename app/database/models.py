@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field, Relationship
 from pydantic import field_validator
@@ -21,9 +22,9 @@ class SensorDb(SensorBase, table=True):
     id: int = Field(default=None, primary_key=True)
     status: SensorStatus = SensorStatus.NORMAL
     segment_id: int = Field(default=None, foreign_key='segmentdb.id', nullable=False)
-    measurements: list['MeasurementDb'] = Relationship(back_populates='sensor')
-    segment: 'SegmentDb' | None = Relationship(back_populates='sensors')
-    status_history: list['SensorStatusDb'] = Relationship(back_populates='sensor')
+    measurements: list[MeasurementDb] = Relationship(back_populates='sensor')
+    segment: SegmentDb | None = Relationship(back_populates='sensors')
+    status_history: list[SensorStatusDb] = Relationship(back_populates='sensor')
 
 # =================================================================================
 #    Sensor status model
@@ -74,4 +75,4 @@ class SegmentIn(SegmentBase):
 
 class SegmentDb(SegmentBase, table=True):
     id: int = Field(default=None, primary_key=True)
-    sensors: list['SensorDb'] = Relationship(back_populates='segment')
+    sensors: list[SensorDb] = Relationship(back_populates='segment')
