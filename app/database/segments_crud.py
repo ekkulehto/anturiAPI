@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
-from .models import SegmentIn, SegmentDb
+from .models import MeasurementDb, SegmentIn, SegmentDb, SegmentOutWithSensors, SensorOutWithLastMeasurement
 
 def create_segment(session: Session, segment_in: SegmentIn):
     segment = SegmentDb.model_validate(segment_in)
@@ -21,7 +21,35 @@ def get_segment_by_id(session: Session, segment_id: int):
             status_code=status.HTTP_404_NOT_FOUND
         )
     
-    return segment
+    sensors_out: list[SensorOutWithLastMeasurement] = []
+
+    for sensor in segment.sensors:
+        query = (
+            select(MeasurementDb)
+            .where(MeasurementDb.sensor_id == sensor.id)
+            .order_by(MeasurementDb.timestamp.desc())
+            .limit(1)
+        )
+
+        last_measurement_db = session.exec(query).first()
+
+        if last_measurement_db is not None:
+            last_measurement_out = MeasurementDb.model_validate(last_measurement_db)
+        else:
+            last_measurement_out = None
+        
+        sensors_out.append(SensorOutWithLastMeasurement(
+            id=sensor.id,
+            name=sensor.name,
+            status=sensor.status,
+            last_measurement=last_measurement_out
+        ))
+    
+    return SegmentOutWithSensors(
+        id=segment.id,
+        name=segment.name,
+        sensors=sensors_out
+    )
 
 def delete_segment_by_id(session: Session, segment_id: int):
     segment = session.get(SegmentDb, segment_id)
