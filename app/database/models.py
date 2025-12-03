@@ -23,7 +23,7 @@ class SensorDb(SensorBase, table=True):
     status: SensorStatus = SensorStatus.NORMAL
     segment_id: int = Field(default=None, foreign_key='segmentdb.id', nullable=False)
     measurements: list['MeasurementDb'] = Relationship(back_populates='sensor')
-    segment: Optional['SegmentDb'] | None = Relationship(back_populates='sensors')
+    segment: Optional['SegmentDb'] = Relationship(back_populates='sensors')
     status_history: list['SensorStatusDb'] = Relationship(back_populates='sensor')
 
 # =================================================================================
@@ -40,7 +40,7 @@ class SensorStatusIn(SensorStatusBase):
 class SensorStatusDb(SensorStatusBase, table=True):
     id: int = Field(default=None, primary_key=True)
     sensor_id: int = Field(default=None, foreign_key='sensordb.id', nullable=False)
-    sensor: Optional['SensorDb'] | None = Relationship(back_populates='status_history')
+    sensor: Optional['SensorDb'] = Relationship(back_populates='status_history')
 
 # =================================================================================
 #    Measurement model
@@ -61,7 +61,7 @@ class MeasurementIn(MeasurementBase):
 class MeasurementDb(MeasurementBase, table=True):
     id: int = Field(default=None, primary_key=True)
     sensor_id: int = Field(default=None, foreign_key='sensordb.id')
-    sensor: Optional['SensorDb'] | None = Relationship(back_populates='measurements')
+    sensor: Optional['SensorDb'] = Relationship(back_populates='measurements')
 
 # =================================================================================
 #    Segment model
