@@ -23,6 +23,12 @@ class SensorOut(SQLModel):
     id: int
     name: str
     status: SensorStatus
+    segment: 'SegmentOut'
+
+class SensorOutWithMeasurements(SQLModel):
+    id: int
+    name: str
+    status: SensorStatus
     measurements: list['MeasurementOut'] = []
 
 class SensorDb(SensorBase, table=True):
@@ -89,7 +95,11 @@ class SegmentIn(SegmentBase):
 class SegmentOut(SQLModel):
     id: int
     name: str
-    sensors: list['SensorOut'] = []
+
+class SegmentOutWithSensors(SQLModel):
+    id: int
+    name: str
+    sensors: list['SensorOutWithMeasurements'] = []
 
 class SegmentDb(SegmentBase, table=True):
     id: int = Field(default=None, primary_key=True)
