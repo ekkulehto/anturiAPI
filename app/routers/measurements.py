@@ -5,7 +5,7 @@ from ..database.database import get_session
 from ..database import measurements_crud as crud
 from ..database.models import MeasurementIn, MeasurementDb
 
-router = APIRouter(prefix='/segments', tags=['segments'])
+router = APIRouter(prefix='/measurements', tags=['measurements'])
 
 @router.get('', response_model=list[MeasurementDb])
 def get_all_measurements(*, session: Session = Depends(get_session)):
