@@ -4,6 +4,10 @@ from sqlmodel import SQLModel, Field, Relationship
 from pydantic import field_validator
 from enum import Enum
 
+# =================================================================================
+#    Enumerables
+# =================================================================================
+
 class SensorStatus(str, Enum):
     NORMAL = "NORMAL"
     ERROR = "ERROR"
