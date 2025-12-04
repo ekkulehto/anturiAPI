@@ -2,7 +2,7 @@ from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
 from app.schemas.segments import SegmentUpdate
-from .models import MeasurementDb, SegmentIn, SegmentDb, SegmentOutWithSensors, SensorOutWithLastMeasurement
+from .models import MeasurementDb, MeasurementOut, SegmentIn, SegmentDb, SegmentOutWithSensors, SensorOutWithLastMeasurement
 
 def create_segment(session: Session, segment_in: SegmentIn):
     segment = SegmentDb.model_validate(segment_in)
@@ -36,7 +36,7 @@ def get_segment_by_id(session: Session, segment_id: int):
         last_measurement_db = session.exec(query).first()
 
         if last_measurement_db is not None:
-            last_measurement_out = MeasurementDb.model_validate(last_measurement_db)
+            last_measurement_out = MeasurementOut.model_validate(last_measurement_db)
         else:
             last_measurement_out = None
         
