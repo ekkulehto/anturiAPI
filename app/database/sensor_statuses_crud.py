@@ -1,10 +1,19 @@
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
-from .models import SensorStatusIn, SensorStatusDb
+from .models import SensorDb, SensorStatusIn, SensorStatusDb
 
 def create_sensor_status(session: Session, sensor_status_in: SensorStatusIn):
+    sensor = session.get(SensorDb, sensor_status_in.sensor_id)
+
+    if not sensor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Sensor not found',
+        )
+
     sensor_status = SensorStatusDb.model_validate(sensor_status_in)
     session.add(sensor_status)
+    sensor.status = sensor_status_in.status
     session.commit()
     session.refresh(sensor_status)
     return sensor_status
