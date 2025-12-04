@@ -24,7 +24,7 @@ def create_sensor(session: Session, sensor_in: SensorIn):
     change_sensor_status(
         session=session,
         sensor_id=new_sensor.id,
-        update_sensor_status=SensorStatusUpdate(status=SensorStatus.NORMAL)
+        sensor_status_update=SensorStatusUpdate(status=SensorStatus.NORMAL)
     )
 
     session.refresh(new_sensor)
