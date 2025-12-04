@@ -33,6 +33,7 @@ class SensorOutWithMeasurements(SQLModel):
     id: int
     name: str
     status: SensorStatus
+    segment: 'SegmentOut'
     measurements: list['MeasurementOut'] = Field(default_factory=list)
 
 class SensorOutWithLastMeasurement(SQLModel):

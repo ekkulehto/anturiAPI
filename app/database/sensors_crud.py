@@ -63,6 +63,7 @@ def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilte
         id=sensor_id,
         name=sensor.name,
         status=sensor.status,
+        segment=sensor.segment,
         measurements=measurements_out
     )
 
@@ -87,7 +88,7 @@ def get_sensor_status_history_by_id(session: Session, sensor_id: int, sensor_sta
     return SensorOutWithStatusHistory(
         id=sensor_id,
         name=sensor.name,
-        status_history=sensor_status_out
+        status_history=sensor_status_out,
     )
 
 def update_sensor_by_id(session: Session, sensor_id: int, sensor_update: SensorUpdate):
