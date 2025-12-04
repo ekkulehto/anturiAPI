@@ -2,6 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Query, status, Depends
 from sqlmodel import Session
 
+from app.schemas.sensors import SensorUpdate
+
 from ..schemas.filters import MeasurementFilter
 from ..database.database import get_session
 
@@ -18,10 +20,14 @@ def get_all_sensors(*, session: Session = Depends(get_session)):
 def get_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int, filters: Annotated[MeasurementFilter, Query()]):
     return crud.get_sensor_by_id(session, sensor_id, filters)
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=SensorDb)
+@router.post('', status_code=status.HTTP_201_CREATED, response_model=SensorDb)
 def create_sensor(*, session: Session = Depends(get_session), sensor_in: SensorIn):
     return crud.create_sensor(session, sensor_in)
 
-@router.delete("/{sensor_id}", response_model=SensorDb)
+@router.patch('{sensor_id}', response_model=SensorOut)
+def update_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int, sensor_update: SensorUpdate):
+    return crud.update_sensor_by_id(session, sensor_id, sensor_update)
+
+@router.delete('/{sensor_id}', response_model=SensorDb)
 def delete_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int):
     return crud.delete_sensor_by_id(session, sensor_id)
