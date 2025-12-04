@@ -8,13 +8,16 @@ from ..schemas.filters import MeasurementFilter
 from ..database.database import get_session
 
 from ..database import sensors_crud as crud
-from ..database.models import SensorIn, SensorDb, SensorOut, SensorOutWithMeasurements
+from ..database.models import SensorIn, SensorDb, SensorOut, SensorOutWithMeasurements, SensorStatus
 
 router = APIRouter(prefix='/sensors', tags=['sensors'])
 
 @router.get('', response_model=list[SensorOut])
-def get_all_sensors(*, session: Session = Depends(get_session)):
-    return crud.get_all_sensors(session)
+def get_all_sensors(*, session: Session = Depends(get_session), status: SensorStatus | None = Query(
+    default=None,
+    description='Filter sensors by current status'
+)):
+    return crud.get_all_sensors(session, status)
 
 @router.get('/{sensor_id}', response_model=SensorOutWithMeasurements)
 def get_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int, filters: Annotated[MeasurementFilter, Query()]):
