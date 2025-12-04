@@ -24,7 +24,7 @@ def get_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int,
 def create_sensor(*, session: Session = Depends(get_session), sensor_in: SensorIn):
     return crud.create_sensor(session, sensor_in)
 
-@router.patch('{sensor_id}', response_model=SensorOut)
+@router.patch('/{sensor_id}', response_model=SensorOut)
 def update_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int, sensor_update: SensorUpdate):
     return crud.update_sensor_by_id(session, sensor_id, sensor_update)
 
