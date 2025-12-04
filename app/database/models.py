@@ -41,6 +41,11 @@ class SensorOutWithLastMeasurement(SQLModel):
     status: SensorStatus
     last_measurement: Optional['MeasurementOut'] = None
 
+class SensorOutWithStatusHistory(SQLModel):
+    id: int
+    name: str
+    status_history: list['SensorStatusOut'] = Field(default_factory=list)
+
 class SensorDb(SensorBase, table=True):
     id: int = Field(default=None, primary_key=True)
     status: SensorStatus = SensorStatus.NORMAL
@@ -59,6 +64,11 @@ class SensorStatusBase(SQLModel):
 
 class SensorStatusIn(SensorStatusBase):
     sensor_id: int
+
+class SensorStatusOut(SQLModel):
+    id: int
+    status: SensorStatus
+    timestamp: datetime
 
 class SensorStatusDb(SensorStatusBase, table=True):
     id: int = Field(default=None, primary_key=True)
