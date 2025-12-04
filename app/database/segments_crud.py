@@ -1,5 +1,7 @@
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
+
+from app.schemas.segments import SegmentUpdate
 from .models import MeasurementDb, SegmentIn, SegmentDb, SegmentOutWithSensors, SensorOutWithLastMeasurement
 
 def create_segment(session: Session, segment_in: SegmentIn):
@@ -50,6 +52,23 @@ def get_segment_by_id(session: Session, segment_id: int):
         name=segment.name,
         sensors=sensors_out
     )
+
+def update_segment_by_id(session: Session, segment_id: int, segment_update: SegmentUpdate):
+    segment = session.get(SegmentDb, segment_id)
+
+    if not segment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Segment not found'
+        )
+    
+    if segment_update.name is not None:
+        segment.name = segment_update.name
+    
+    session.add(segment)
+    session.commit()
+    session.refresh(segment)
+    return segment
 
 def delete_segment_by_id(session: Session, segment_id: int):
     segment = session.get(SegmentDb, segment_id)
