@@ -27,8 +27,13 @@ def create_sensor(session: Session, sensor_in: SensorIn):
 
     return new_sensor
 
-def get_all_sensors(session: Session):
-    return session.exec(select(SensorDb)).all()
+def get_all_sensors(session: Session, status: SensorStatus | None = None):
+    query = select(SensorDb)
+
+    if status is not None:
+        query = query.where(SensorDb.status == status)
+
+    return session.exec(query).all()
 
 def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilter):
     sensor = session.get(SensorDb, sensor_id)
