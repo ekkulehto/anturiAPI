@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
+from app.schemas.sensors import SensorUpdate
+
 from ..schemas.filters import MeasurementFilter
 from .models import MeasurementDb, MeasurementOut, SegmentDb, SensorIn, SensorDb, SensorOutWithMeasurements, SensorStatus, SensorStatusDb
 
@@ -58,6 +60,34 @@ def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilte
         status=sensor.status,
         measurements=measurements_out
     )
+
+def update_sensor_by_id(session: Session, sensor_id: int, sensor_update: SensorUpdate):
+    sensor = session.get(SensorDb, sensor_id)
+
+    if not sensor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Sensor not found'
+        )
+    
+    if sensor_update.name is not None:
+        sensor.name = sensor_update.name
+    
+    if sensor_update.segment_id is not None:
+        new_segment = session.get(SegmentDb, sensor_update.segment_id)
+
+        if not new_segment:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Segment not found'
+            )
+
+        sensor.segment_id = sensor_update.segment_id
+    
+    session.add(sensor)
+    session.commit()
+    session.refresh(sensor)
+    return sensor
 
 def delete_sensor_by_id(session: Session, sensor_id: int):
     sensor = session.get(SensorDb, sensor_id)
