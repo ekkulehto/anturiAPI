@@ -8,7 +8,8 @@ from .models import (
     MeasurementOut, 
     SegmentDb, 
     SensorIn, 
-    SensorDb, 
+    SensorDb,
+    SensorOut, 
     SensorOutWithMeasurements, 
     SensorOutWithStatusHistory, 
     SensorStatus, 
@@ -166,4 +167,4 @@ def change_sensor_status_by_id(session: Session, sensor_id: int, sensor_status_u
     session.commit()
     session.refresh(existing_sensor)
 
-    return SensorStatusOut.model_validate(sensor_status_db)
+    return existing_sensor
