@@ -1,8 +1,8 @@
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
-from app.schemas.segments import SegmentUpdate
-from .models import (
+from src.schemas.segments import SegmentUpdate
+from ..database.models import (
     MeasurementDb, 
     MeasurementOut, 
     SegmentIn, 
