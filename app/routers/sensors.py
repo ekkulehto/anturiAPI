@@ -47,6 +47,6 @@ def get_sensor_status_history_by_id(*, session: Session = Depends(get_session), 
     return crud.get_sensor_status_history_by_id(session, sensor_id, sensor_status)
 
 @router.post('/{sensor_id}/status', response_model=SensorOut, status_code=status.HTTP_202_ACCEPTED)
-def change_sensor_status(*, session: Session = Depends(get_session), sensor_id: int, sensor_status_update: SensorStatusUpdate):
-    return crud.change_sensor_status(session, sensor_id, sensor_status_update)
+def change_sensor_status_by_id(*, session: Session = Depends(get_session), sensor_id: int, sensor_status_update: SensorStatusUpdate):
+    return crud.change_sensor_status_by_id(session, sensor_id, sensor_status_update)
 

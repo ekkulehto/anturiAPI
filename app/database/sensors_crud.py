@@ -38,7 +38,7 @@ def create_sensor(session: Session, sensor_in: SensorIn):
     session.commit()
     session.refresh(new_sensor)
 
-    change_sensor_status(
+    change_sensor_status_by_id(
         session=session,
         sensor_id=new_sensor.id,
         sensor_status_update=SensorStatusUpdate(status=SensorStatus.NORMAL)
@@ -145,7 +145,7 @@ def get_sensor_status_history_by_id(session: Session, sensor_id: int, sensor_sta
         status_history=sensor_status_out,
     )
 
-def change_sensor_status(session: Session, sensor_id: int, sensor_status_update: SensorStatusUpdate):
+def change_sensor_status_by_id(session: Session, sensor_id: int, sensor_status_update: SensorStatusUpdate):
     existing_sensor = session.get(SensorDb, sensor_id)
 
     if not existing_sensor:
