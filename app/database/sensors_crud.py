@@ -92,6 +92,7 @@ def get_sensor_status_history_by_id(session: Session, sensor_id: int, sensor_sta
     return SensorOutWithStatusHistory(
         id=sensor_id,
         name=sensor.name,
+        segment=sensor.segment,
         status_history=sensor_status_out,
     )
 
@@ -157,4 +158,3 @@ def delete_sensor_by_id(session: Session, sensor_id: int):
     
     session.delete(sensor)
     session.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
