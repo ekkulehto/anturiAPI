@@ -2,8 +2,8 @@ from fastapi import APIRouter, status, Depends
 from sqlmodel import Session
 
 from ..database import get_session
-from ..database import measurements_crud as crud
-from ..database.models import MeasurementIn, MeasurementOutWithSensor
+from ..measurements import service as crud
+from .models import MeasurementIn, MeasurementOutWithSensor
 
 router = APIRouter(prefix='/measurements', tags=['Measurements'])
 

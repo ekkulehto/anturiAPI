@@ -3,10 +3,10 @@ from fastapi import APIRouter, Query, status, Depends
 from sqlmodel import Session
 
 from src.database import get_session
-from src.schemas.sensors import SensorStatusUpdate, SensorUpdate
-from ..schemas.filters import MeasurementFilter
-from ..database import sensors_crud as crud
-from ..database.models import (
+from .schemas import SensorStatusUpdate, SensorUpdate
+from ..measurements.schemas import MeasurementFilter
+from ..sensors import service as crud
+from .models import (
     SensorIn, 
     SensorOut, 
     SensorOutWithMeasurements, 

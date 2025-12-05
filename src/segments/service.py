@@ -1,14 +1,17 @@
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
-from src.schemas.segments import SegmentUpdate
-from ..database.models import (
-    MeasurementDb, 
-    MeasurementOut, 
+from .schemas import SegmentUpdate
+from .models import (
     SegmentIn, 
     SegmentDb, 
     SegmentOutWithSensors, 
     SensorOutWithLastMeasurement
+)
+
+from ..measurements.models import (
+    MeasurementDb, 
+    MeasurementOut, 
 )
 
 def get_all_segments(session: Session):

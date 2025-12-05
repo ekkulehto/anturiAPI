@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel
 
-from src.database.models import SensorStatus
+from .models import SensorStatus
 
 class SensorUpdate(SQLModel):
     name: Optional[str] = Field(default=None, description='New sensor name')

@@ -3,8 +3,8 @@ from sqlmodel import Session
 
 from .schemas import SegmentUpdate
 from ..database import get_session
-from ..database import segments_crud as crud
-from ..models import SegmentIn, SegmentOut, SegmentOutWithSensors
+from ..segments import service as crud
+from .models import SegmentIn, SegmentOut, SegmentOutWithSensors
 
 router = APIRouter(prefix='/segments', tags=['Segments'])
 

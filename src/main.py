@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-from database import create_db
+from .database import create_db
 from .sensors.router import router as sensors_router
 from .measurements.router import router as measurements_router
 from .segments.router import router as segments_router
