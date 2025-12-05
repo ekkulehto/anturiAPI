@@ -2,11 +2,11 @@ from typing import Annotated
 from fastapi import APIRouter, Query, status, Depends
 from sqlmodel import Session
 
-from src.database import get_session
+from ..database import get_session
 from .schemas import SensorStatusUpdate, SensorUpdate
 from ..measurements.schemas import MeasurementFilter
 from ..sensors import service as crud
-from .models import (
+from ..models import (
     SensorIn, 
     SensorOut, 
     SensorOutWithMeasurements, 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status, Depends
 from sqlmodel import Session
 
-from .schemas import SegmentUpdate
 from ..database import get_session
+from .schemas import SegmentUpdate
 from ..segments import service as crud
-from .models import SegmentIn, SegmentOut, SegmentOutWithSensors
+from ..models import SegmentIn, SegmentOut, SegmentOutWithSensors
 
 router = APIRouter(prefix='/segments', tags=['Segments'])
 

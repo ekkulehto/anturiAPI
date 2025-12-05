@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from ..database import get_session
 from ..measurements import service as crud
-from .models import MeasurementIn, MeasurementOutWithSensor
+from ..models import MeasurementIn, MeasurementOutWithSensor
 
 router = APIRouter(prefix='/measurements', tags=['Measurements'])
 

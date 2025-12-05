@@ -2,14 +2,11 @@ from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
 from .schemas import SegmentUpdate
-from .models import (
+from ..models import (
     SegmentIn, 
     SegmentDb, 
     SegmentOutWithSensors, 
-    SensorOutWithLastMeasurement
-)
-
-from ..measurements.models import (
+    SensorOutWithLastMeasurement,
     MeasurementDb, 
     MeasurementOut, 
 )

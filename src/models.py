@@ -2,9 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
-
-from ..segments.models import SegmentOut, SegmentDb
-from ..measurements.models import MeasurementOut, MeasurementDb
+from pydantic import field_validator
 
 # =================================================================================
 #    Enumerables
@@ -15,7 +13,7 @@ class SensorStatus(str, Enum):
     ERROR = "ERROR"
 
 # =================================================================================
-#    Sensor model
+#    Sensor
 # =================================================================================
 
 class SensorBase(SQLModel):
@@ -65,7 +63,7 @@ class SensorDb(SensorBase, table=True):
         )
 
 # =================================================================================
-#    Sensor status model
+#    Sensor status
 # =================================================================================
 
 class SensorStatusBase(SQLModel):
@@ -84,3 +82,58 @@ class SensorStatusDb(SensorStatusBase, table=True):
     id: int = Field(default=None, primary_key=True)
     sensor_id: int = Field(foreign_key='sensordb.id', nullable=False)
     sensor: Optional['SensorDb'] = Relationship(back_populates='status_history')
+
+# =================================================================================
+#    Measurements
+# =================================================================================
+
+class MeasurementBase(SQLModel):
+    sensor_id: int
+    temperature: float
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    @field_validator('temperature')
+    @classmethod
+    def round_temperature_to_one_decimal(cls, temperature: float) -> float:
+        return round(temperature, 1)
+
+class MeasurementIn(MeasurementBase):
+    pass
+
+class MeasurementOut(SQLModel):
+    id: int
+    temperature: float
+    timestamp: datetime
+
+class MeasurementOutWithSensor(SQLModel):
+    sensor_id: int
+    measurement: 'MeasurementOut'
+
+class MeasurementDb(MeasurementBase, table=True):
+    id: int = Field(default=None, primary_key=True)
+    sensor_id: int = Field(foreign_key='sensordb.id')
+    sensor: Optional['SensorDb'] = Relationship(back_populates='measurements')
+
+
+# =================================================================================
+#    Segments
+# =================================================================================
+
+class SegmentBase(SQLModel):
+    name: str
+
+class SegmentIn(SegmentBase):
+    pass
+
+class SegmentOut(SQLModel):
+    id: int
+    name: str
+
+class SegmentOutWithSensors(SQLModel):
+    id: int
+    name: str
+    sensors: list['SensorOutWithLastMeasurement'] = Field(default_factory=list)
+
+class SegmentDb(SegmentBase, table=True):
+    id: int = Field(default=None, primary_key=True)
+    sensors: list['SensorDb'] = Relationship(back_populates='segment')
