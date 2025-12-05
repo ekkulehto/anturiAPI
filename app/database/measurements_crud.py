@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Response, status
+from fastapi import HTTPException, status
 from sqlmodel import Session, select
 from .models import MeasurementIn, MeasurementDb, MeasurementOut, MeasurementOutWithSensor
 
