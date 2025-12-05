@@ -2,9 +2,9 @@ from typing import Annotated
 from fastapi import APIRouter, Query, status, Depends
 from sqlmodel import Session
 
-from app.schemas.sensors import SensorStatusUpdate, SensorUpdate
+from src.database import get_session
+from src.schemas.sensors import SensorStatusUpdate, SensorUpdate
 from ..schemas.filters import MeasurementFilter
-from ..database.database import get_session
 from ..database import sensors_crud as crud
 from ..database.models import (
     SensorIn, 
