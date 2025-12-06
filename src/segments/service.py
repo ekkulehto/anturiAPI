@@ -1,15 +1,18 @@
 from fastapi import HTTPException, Response, status
 from sqlmodel import Session, select
 
+from ..measurements.schemas import MeasurementFilterForGetSegmentById
+
 from .schemas import SegmentUpdate
 from ..models import (
     SegmentIn, 
     SegmentDb,
     SegmentOutWithNumberOfSensors, 
     SegmentOutWithSensors, 
-    SensorOutWithLastMeasurement,
     MeasurementDb, 
-    MeasurementOut, 
+    MeasurementOut,
+    SensorOutInSegmentWithMeasurements,
+    SensorOutWithMeasurements, 
 )
 
 # =================================================================================
@@ -43,43 +46,61 @@ def create_segment(session: Session, segment_in: SegmentIn):
 #    GET SEGMENT BY ID
 # =================================================================================
 
-def get_segment_by_id(session: Session, segment_id: int):
+def get_segment_by_id(session: Session, segment_id: int, filters: MeasurementFilterForGetSegmentById):
     segment = session.get(SegmentDb, segment_id)
 
     if not segment:
         raise HTTPException(
             detail='Segment not found',
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND,
         )
-    
-    sensors_out: list[SensorOutWithLastMeasurement] = []
+
+    sensors_out: list[SensorOutWithMeasurements] = []
 
     for sensor in segment.sensors:
+        query = select(MeasurementDb).where(MeasurementDb.sensor_id == sensor.id)
+
+        if filters.measurement_type is not None:
+            query = query.where(MeasurementDb.type == filters.measurement_type)
+
+        if filters.since is not None:
+            query = query.where(MeasurementDb.timestamp >= filters.since)
+
+        if filters.until is not None:
+            query = query.where(MeasurementDb.timestamp <= filters.until)
+
         query = (
-            select(MeasurementDb)
-            .where(MeasurementDb.sensor_id == sensor.id)
+            query
             .order_by(MeasurementDb.timestamp.desc())
-            .limit(1)
+            .limit(filters.limit)
         )
 
-        last_measurement_db = session.exec(query).first()
+        measurements_db = session.exec(query).all()
 
-        if last_measurement_db is not None:
-            last_measurement_out = MeasurementOut.model_validate(last_measurement_db)
-        else:
-            last_measurement_out = None
-        
-        sensors_out.append(SensorOutWithLastMeasurement(
-            id=sensor.id,
-            name=sensor.name,
-            status=sensor.status,
-            last_measurement=last_measurement_out
-        ))
-    
+        measurements_out = [
+            MeasurementOut(
+                id=measurement.id,
+                value=measurement.value,
+                unit=measurement.unit,
+                type=measurement.type,
+                timestamp=measurement.timestamp,
+            )
+            for measurement in measurements_db
+        ]
+
+        sensors_out.append(
+            SensorOutInSegmentWithMeasurements(
+                id=sensor.id,
+                name=sensor.name,
+                status=sensor.status,
+                measurements=measurements_out,
+            )
+        )
+
     return SegmentOutWithSensors(
         id=segment.id,
         name=segment.name,
-        sensors=sensors_out
+        sensors=sensors_out,
     )
 
 # =================================================================================
