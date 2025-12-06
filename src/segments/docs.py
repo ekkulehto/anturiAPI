@@ -47,5 +47,6 @@ DELETE_SEGMENT_BY_ID_SUMMARY = 'Delete a segment by ID'
 DELETE_SEGMENT_BY_ID_DESCRIPTION = (
     'Delete a segment by its unique ID. '
     'A segment can only be deleted if it has no sensors assigned to it. '
-    'If the segment still contains sensors, the operation should fail with an error response.'
+    'If the segment still contains sensors, the operation should fail with an error response. '
+    'Does not return any content, only the HTTP status code.'
 )
