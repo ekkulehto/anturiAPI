@@ -143,6 +143,11 @@ class SegmentOut(SQLModel):
     id: int
     name: str
 
+class SegmentOutWithNumberOfSensors(SQLModel):
+    id: int
+    name: str
+    number_of_sensors: int
+
 class SegmentOutWithSensors(SQLModel):
     id: int
     name: str
