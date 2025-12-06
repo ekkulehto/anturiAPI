@@ -35,17 +35,28 @@ from .docs import (
 
 router = APIRouter(prefix='/sensors', tags=['Sensors'])
 
+# =================================================================================
+#    GET ALL SENSORS
+# =================================================================================
+
 @router.get(
         '', 
         response_model=list[SensorOut],
         summary=GET_ALL_SENSORS_SUMMARY,
         description=GET_ALL_SENSORS_DESCRIPTION
 )
-def get_all_sensors(*, session: Session = Depends(get_session), sensor_status: SensorStatus | None = Query(
+def get_all_sensors(
+    *, 
+    session: Session = Depends(get_session), 
+    sensor_status: SensorStatus | None = Query(
     default=None,
     description=GET_ALL_SENSORS_STATUS_FILTER_DESCRIPTION
 )):
     return crud.get_all_sensors(session, sensor_status)
+
+# =================================================================================
+#    CREATE NEW SENSOR
+# =================================================================================
 
 @router.post(
         '', 
@@ -54,8 +65,16 @@ def get_all_sensors(*, session: Session = Depends(get_session), sensor_status: S
         summary=CREATE_SENSOR_SUMMARY,
         description=CREATE_SENSOR_DESCRIPTION
 )
-def create_sensor(*, session: Session = Depends(get_session), sensor_in: SensorIn):
+def create_sensor(
+    *, 
+    session: Session = Depends(get_session), 
+    sensor_in: SensorIn
+):
     return crud.create_sensor(session, sensor_in)
+
+# =================================================================================
+#    GET SENSOR BY ID
+# =================================================================================
 
 @router.get(
         '/{sensor_id}', 
@@ -63,8 +82,16 @@ def create_sensor(*, session: Session = Depends(get_session), sensor_in: SensorI
         summary=GET_SENSOR_BY_ID_SUMMARY,
         description=GET_SENSOR_BY_ID_DESCRIPTION
 )
-def get_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int, filters: Annotated[MeasurementFilter, Query()]):
+def get_sensor_by_id(
+    *, session: Session = Depends(get_session), 
+    sensor_id: int, 
+    filters: Annotated[MeasurementFilter, Query()]
+):
     return crud.get_sensor_by_id(session, sensor_id, filters)
+
+# =================================================================================
+#    UPDATE SENSOR BY ID
+# =================================================================================
 
 @router.patch(
         '/{sensor_id}', 
@@ -72,8 +99,17 @@ def get_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int,
         summary=UPDATE_SENSOR_BY_ID_SUMMARY,
         description=UPDATE_SENSOR_BY_ID_DESCRIPTION
 )
-def update_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int, sensor_update: SensorUpdate):
+def update_sensor_by_id(
+    *, 
+    session: Session = Depends(get_session), 
+    sensor_id: int, 
+    sensor_update: SensorUpdate
+):
     return crud.update_sensor_by_id(session, sensor_id, sensor_update)
+
+# =================================================================================
+#    DELETE SENSOR BY ID
+# =================================================================================
 
 @router.delete(
         '/{sensor_id}', 
@@ -81,8 +117,16 @@ def update_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: i
         summary=DELETE_SENSOR_BY_ID_SUMMARY,
         description=DELETE_SENSOR_BY_ID_DESCRIPTION
 )
-def delete_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: int):
+def delete_sensor_by_id(
+    *, 
+    session: Session = Depends(get_session), 
+    sensor_id: int
+):
     return crud.delete_sensor_by_id(session, sensor_id)
+
+# =================================================================================
+#    GET SENSOR STATUS HISTORY BY ID
+# =================================================================================
 
 @router.get(
         '/{sensor_id}/status_history', 
@@ -90,11 +134,19 @@ def delete_sensor_by_id(*, session: Session = Depends(get_session), sensor_id: i
         summary=GET_SENSOR_STATUS_HISTORY_BY_ID_SUMMARY,
         description=GET_SENSOR_STATUS_HISTORY_BY_ID_DESCRIPTION
 )
-def get_sensor_status_history_by_id(*, session: Session = Depends(get_session), sensor_id: int, sensor_status: SensorStatus | None = Query(
+def get_sensor_status_history_by_id(
+    *, 
+    session: Session = Depends(get_session), 
+    sensor_id: int, 
+    sensor_status: SensorStatus | None = Query(
     default=None,
     description=GET_SENSOR_STATUS_HISTORY_BY_ID_FILTER_DESCRIPTION
 )):
     return crud.get_sensor_status_history_by_id(session, sensor_id, sensor_status)
+
+# =================================================================================
+#    CHANGE SENSOR STATUS BY ID
+# =================================================================================
 
 @router.post(
         '/{sensor_id}/status', 
@@ -103,6 +155,11 @@ def get_sensor_status_history_by_id(*, session: Session = Depends(get_session), 
         summary=CHANGE_SENSOR_STATUS_SUMMARY,
         description=CHANGE_SENSOR_STATUS_DESCRIPTION
 )
-def change_sensor_status_by_id(*, session: Session = Depends(get_session), sensor_id: int, sensor_status_update: SensorStatusUpdate):
+def change_sensor_status_by_id(
+    *, 
+    session: Session = Depends(get_session), 
+    sensor_id: int, 
+    sensor_status_update: SensorStatusUpdate
+):
     return crud.change_sensor_status_by_id(session, sensor_id, sensor_status_update)
 

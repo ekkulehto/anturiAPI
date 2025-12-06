@@ -18,14 +18,25 @@ from .docs import (
 
 router = APIRouter(prefix='/measurements', tags=['Measurements'])
 
+# =================================================================================
+#    GET ALL MEASUREMENTS
+# =================================================================================
+
 @router.get(
         '', 
         response_model=list[MeasurementOutWithSensor], 
         summary=GET_ALL_MEASUREMENTS_SUMMARY, 
         description=GET_ALL_MEASUREMENTS_DESCRIPTION
 )
-def get_all_measurements(*, session: Session = Depends(get_session)):
+def get_all_measurements(
+    *, 
+    session: Session = Depends(get_session)
+):
     return crud.get_all_measurements(session)
+
+# =================================================================================
+#    CREATE NEW MEASUREMENT
+# =================================================================================
 
 @router.post(
         '', 
@@ -34,8 +45,16 @@ def get_all_measurements(*, session: Session = Depends(get_session)):
         summary=CREATE_MEASUREMENT_SUMMARY,
         description=CREATE_MEASUREMENT_DESCRIPTION
 )
-def create_measurement(*, session: Session = Depends(get_session), measurement_in: MeasurementIn):
+def create_measurement(
+    *, 
+    session: Session = Depends(get_session), 
+    measurement_in: MeasurementIn
+):
     return crud.create_measurement(session, measurement_in)
+
+# =================================================================================
+#    GET MEASUREMENT BY ID
+# =================================================================================
 
 @router.get(
         '/{measurement_id}', 
@@ -43,8 +62,16 @@ def create_measurement(*, session: Session = Depends(get_session), measurement_i
         summary=GET_MEASUREMENT_BY_ID_SUMMARY,
         description=GET_MEASUREMENT_BY_ID_DESCRIPTION
 )
-def get_measurement_by_id(*, session: Session = Depends(get_session), measurement_id: int):
+def get_measurement_by_id(
+    *, 
+    session: Session = Depends(get_session), 
+    measurement_id: int
+):
     return crud.get_measurement_by_id(session, measurement_id)
+
+# =================================================================================
+#    DELETE MEASUREMENT BY ID
+# =================================================================================
 
 @router.delete(
         '/{measurement_id}', 
@@ -52,5 +79,9 @@ def get_measurement_by_id(*, session: Session = Depends(get_session), measuremen
         summary=DELETE_MEASUREMENT_BY_ID_SUMMARY,
         description=DELETE_MEASUREMENT_BY_ID_DESCRIPTION
 )
-def delete_measurement_by_id(*, session: Session = Depends(get_session), measurement_id: int):
+def delete_measurement_by_id(
+    *, 
+    session: Session = Depends(get_session), 
+    measurement_id: int
+):
     return crud.delete_measurement_by_id(session, measurement_id)
