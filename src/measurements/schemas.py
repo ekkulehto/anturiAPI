@@ -31,10 +31,10 @@ class MeasurementFilterForGetSegmentById(BaseModel):
         description='Optional filter for measurement type.',
     )
     since: datetime | None = Field(
-        default=None,
-        description='Optional start of the time range for measurements.',
+        default=datetime(1970, 1, 1, tzinfo=timezone.utc), 
+        description='Start of the time range.'
     )
     until: datetime | None = Field(
         default=None,
-        description='Optional end of the time range for measurements.',
+        description='End of the time range. If omitted, the current time is used.'
     )
