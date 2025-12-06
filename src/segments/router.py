@@ -4,7 +4,7 @@ from sqlmodel import Session
 from ..database import get_session
 from .schemas import SegmentUpdate
 from ..segments import service as crud
-from ..models import SegmentIn, SegmentOut, SegmentOutWithSensors
+from ..models import SegmentIn, SegmentOut, SegmentOutWithNumberOfSensors, SegmentOutWithSensors
 
 from .docs import (
         GET_ALL_SEGMENTS_SUMMARY,
@@ -27,7 +27,7 @@ router = APIRouter(prefix='/segments', tags=['Segments'])
 
 @router.get(
         '', 
-        response_model=list[SegmentOut],
+        response_model=list[SegmentOutWithNumberOfSensors],
         summary=GET_ALL_SEGMENTS_SUMMARY,
         description=GET_ALL_SEGMENTS_DESCRIPTION
 )
@@ -85,7 +85,7 @@ def get_segment_by_id(
 def update_segment_by_id(
     *, 
     session: Session = Depends(get_session), 
-    segment_id:int, 
+    segment_id: int, 
     segment_update: SegmentUpdate
 ):
     return crud.update_segment_by_id(session, segment_id, segment_update)
