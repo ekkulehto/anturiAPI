@@ -3,76 +3,76 @@
 # =================================================================================
 
 GET_ALL_SENSORS_SUMMARY = 'List all sensors'
-GET_ALL_SENSORS_DESCRIPTION = (
-    'Return all sensors registered in the system. '
-    'Optionally filter the result by the current status of the sensor.'
-)
-GET_ALL_SENSORS_STATUS_FILTER_DESCRIPTION = (
-    'Filter sensors by their current status. '
-    'If omitted, all sensors are returned.'
-)
+GET_ALL_SENSORS_DESCRIPTION = '''
+- Return all sensors registered in the system.
+- Include basic information and the segment each sensor belongs to.
+- Intended for general overview and management of all sensors.
+'''
+GET_ALL_SENSORS_STATUS_FILTER_DESCRIPTION = 'Filter sensors by their current status. If omitted, sensors in all statuses are included.'
 
 # =================================================================================
 #    CREATE NEW SENSOR
 # =================================================================================
 
 CREATE_SENSOR_SUMMARY = 'Create a new sensor'
-CREATE_SENSOR_DESCRIPTION = (
-    'Register a new sensor in the system and assign it to an existing segment. '
-    'The sensor is created with status NORMAL by default.'
-)
+CREATE_SENSOR_DESCRIPTION = '''
+- Register a new sensor in the system.
+- Assign the sensor to an existing segment.
+- The sensor is created with status NORMAL by default.
+'''
 
 # =================================================================================
 #    GET SENSOR BY ID
 # =================================================================================
 
 GET_SENSOR_BY_ID_SUMMARY = 'Get a sensor with its measurements by ID'
-GET_SENSOR_BY_ID_DESCRIPTION = (
-    'Fetch a single sensor by its unique ID, including its basic information and measurements. '
-    'Measurements can be filtered by limit and time range (since/until).'
-)
+GET_SENSOR_BY_ID_DESCRIPTION = '''
+- Fetch a single sensor by its unique ID.
+- Include sensor details, the segment it belongs to, and its measurements.
+- Intended for inspecting one sensor in detail.
+'''
 
 # =================================================================================
 #    UPDATE SENSOR BY ID
 # =================================================================================
 
 UPDATE_SENSOR_BY_ID_SUMMARY = 'Update a sensor by ID'
-UPDATE_SENSOR_BY_ID_DESCRIPTION = (
-    'Update basic fields of an existing sensor, such as its name or the segment it belongs to. '
-    'Only the fields provided in the request body are updated.'
-)
+UPDATE_SENSOR_BY_ID_DESCRIPTION = '''
+- Update basic fields of an existing sensor, such as its name.
+- Optionally change the segment the sensor belongs to.
+- Only the fields provided in the request body are updated.
+'''
 
 # =================================================================================
 #    DELETE SENSOR BY ID
 # =================================================================================
 
 DELETE_SENSOR_BY_ID_SUMMARY = 'Delete a sensor by ID'
-DELETE_SENSOR_BY_ID_DESCRIPTION = (
-    'Delete a sensor from the system by its unique ID. '
-    "This will also remove it's measurements. "
-    'Does not return any content, only the HTTP status code.'
-)
+DELETE_SENSOR_BY_ID_DESCRIPTION = '''
+- Delete a sensor from the system by its unique ID.
+- Also remove all measurements associated with this sensor.
+- Return only the HTTP status code, without a response body.
+'''
 
 # =================================================================================
 #    GET SENSOR STATUS HISTORY BY ID
 # =================================================================================
 
 GET_SENSOR_STATUS_HISTORY_BY_ID_SUMMARY = 'Get sensor status history by ID'
-GET_SENSOR_STATUS_HISTORY_BY_ID_DESCRIPTION = (
-    'Return the status change history for a given sensor, including timestamps. '
-    'This can be used, for example, to build a chart of error occurrences over time.'
-)
-GET_SENSOR_STATUS_HISTORY_BY_ID_FILTER_DESCRIPTION = (
-    'Optional filter for status history entries. '
-    'If omitted, all status changes are returned.'
-)
+GET_SENSOR_STATUS_HISTORY_BY_ID_DESCRIPTION = '''
+- Return the status change history for a given sensor.
+- Include timestamps for each status change.
+- Useful for analysing how often and when the sensor has been in ERROR state.
+'''
+GET_SENSOR_STATUS_HISTORY_BY_ID_FILTER_DESCRIPTION = 'Optionally restrict results to a single status value. If omitted, all recorded status changes are included.'
 
 # =================================================================================
 #    CHANGE SENSOR STATUS BY ID
 # =================================================================================
 
 CHANGE_SENSOR_STATUS_BY_ID_SUMMARY = 'Change sensor status by ID'
-CHANGE_SENSOR_STATUS_BY_ID_DESCRIPTION = (
-    'Change the current status of a sensor. '
-    'Each status change is recorded in the sensor status history with a timestamp.'
-)
+CHANGE_SENSOR_STATUS_BY_ID_DESCRIPTION = '''
+- Change the current status of a sensor.
+- Record each status change in the sensor status history with a timestamp.
+- Intended for external systems or operators to control sensor state.
+'''
