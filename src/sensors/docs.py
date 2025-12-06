@@ -1,10 +1,10 @@
 GET_ALL_SENSORS_SUMMARY = 'List all sensors'
 GET_ALL_SENSORS_DESCRIPTION = (
     'Return all sensors registered in the system. '
-    'Optionally filter the result by the current status of the sensor (NORMAL or ERROR).'
+    'Optionally filter the result by the current status of the sensor.'
 )
 GET_ALL_SENSORS_STATUS_FILTER_DESCRIPTION = (
-    'Filter sensors by their current status (NORMAL or ERROR). '
+    'Filter sensors by their current status. '
     'If omitted, all sensors are returned.'
 )
 
@@ -44,6 +44,6 @@ GET_SENSOR_STATUS_HISTORY_BY_ID_FILTER_DESCRIPTION = (
 
 CHANGE_SENSOR_STATUS_SUMMARY = 'Change sensor status'
 CHANGE_SENSOR_STATUS_DESCRIPTION = (
-    'Change the current status of a sensor (for example from NORMAL to ERROR or back). '
+    'Change the current status of a sensor. '
     'Each status change is recorded in the sensor status history with a timestamp.'
 )
