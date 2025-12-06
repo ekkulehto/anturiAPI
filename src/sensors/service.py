@@ -61,13 +61,13 @@ def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilte
 
     if filters.since is not None:
         query = query.where(MeasurementDb.timestamp >= filters.since)
+    
     if filters.until is not None:
         query = query.where(MeasurementDb.timestamp <= filters.until)
     
     query = query.order_by(MeasurementDb.timestamp.desc())
 
-    if filters.since is None and filters.until is None:
-        query = query.limit(filters.limit)
+    query = query.limit(filters.limit)
     
     measurements_db = session.exec(query).all()
     measurements_out = [MeasurementOut.model_validate(measurement) for measurement in measurements_db]
