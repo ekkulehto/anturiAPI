@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
 from .schemas import SensorStatusUpdate, SensorUpdate
-from ..measurements.schemas import MeasurementFilter
+from ..measurements.schemas import MeasurementFilterForGetSensorById
 from ..models import (
     SensorIn, 
     SensorDb,
@@ -60,7 +60,7 @@ def create_sensor(session: Session, sensor_in: SensorIn):
 #    GET SENSOR BY ID
 # =================================================================================
 
-def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilter):
+def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilterForGetSensorById):
     sensor = session.get(SensorDb, sensor_id)
 
     if not sensor:

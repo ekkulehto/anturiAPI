@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from ..database import get_session
 from .schemas import SensorStatusUpdate, SensorUpdate
-from ..measurements.schemas import MeasurementFilter
+from ..measurements.schemas import MeasurementFilterForGetSensorById
 from ..sensors import service as crud
 from ..models import (
     SensorIn, 
@@ -85,7 +85,7 @@ def create_sensor(
 def get_sensor_by_id(
     *, session: Session = Depends(get_session), 
     sensor_id: int, 
-    filters: Annotated[MeasurementFilter, Query()]
+    filters: Annotated[MeasurementFilterForGetSensorById, Query()]
 ):
     return crud.get_sensor_by_id(session, sensor_id, filters)
 
