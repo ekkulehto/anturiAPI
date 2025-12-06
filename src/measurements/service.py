@@ -8,6 +8,10 @@ from ..models import (
     MeasurementOutWithSensor
 )
 
+# =================================================================================
+#    GET ALL SEGMENTS
+# =================================================================================
+
 def get_all_measurements(session: Session):
     measurements_db = session.exec(select(MeasurementDb)).all()
 
@@ -24,6 +28,10 @@ def get_all_measurements(session: Session):
         )
         for measurement in measurements_db
     ]
+
+# =================================================================================
+#    CREATE NEW MEASUREMENT
+# =================================================================================
 
 def create_measurement(session: Session, measurement_in: MeasurementIn):
     payload = measurement_in.measurement
@@ -51,6 +59,10 @@ def create_measurement(session: Session, measurement_in: MeasurementIn):
         ),
     )
 
+# =================================================================================
+#    GET MEASUREMENT BY ID
+# =================================================================================
+
 def get_measurement_by_id(session: Session, measurement_id: int):
     measurement = session.get(MeasurementDb, measurement_id)
 
@@ -70,6 +82,10 @@ def get_measurement_by_id(session: Session, measurement_id: int):
                 timestamp=measurement.timestamp,
             )
         )
+
+# =================================================================================
+#    DELETE MEASUREMENT BY ID
+# =================================================================================
 
 def delete_measurement_by_id(session: Session, measurement_id: int):
     measurement = session.get(MeasurementDb, measurement_id)
