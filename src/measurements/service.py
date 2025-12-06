@@ -6,7 +6,9 @@ from ..models import (
     MeasurementDb, 
     MeasurementOut, 
     MeasurementOutWithSensor,
-    MeasurementType
+    MeasurementType,
+    SensorDb,
+    SensorStatus
 )
 
 # =================================================================================
@@ -40,6 +42,20 @@ def get_all_measurements(session: Session, measurement_type: MeasurementType | N
 # =================================================================================
 
 def create_measurement(session: Session, measurement_in: MeasurementIn):
+    sensor = session.get(SensorDb, measurement_in.sensor_id)
+
+    if sensor is None:
+        raise HTTPException(
+            status_code=404,
+            detail='Sensor not found.',
+        )
+
+    if sensor.status == SensorStatus.ERROR:
+        raise HTTPException(
+            status_code=400,
+            detail='Sensor is in ERROR state and must not send measurements.'
+        )
+    
     payload = measurement_in.measurement
 
     measurement = MeasurementDb(
