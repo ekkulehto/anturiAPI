@@ -16,6 +16,10 @@ from ..models import (
     SegmentDb, 
 )
 
+# =================================================================================
+#    GET ALL SENSORS
+# =================================================================================
+
 def get_all_sensors(session: Session, sensor_status: SensorStatus | None = None):
     query = select(SensorDb)
 
@@ -23,6 +27,10 @@ def get_all_sensors(session: Session, sensor_status: SensorStatus | None = None)
         query = query.where(SensorDb.status == sensor_status)
 
     return session.exec(query).all()
+
+# =================================================================================
+#    CREATE NEW SENSOR
+# =================================================================================
 
 def create_sensor(session: Session, sensor_in: SensorIn):
     segment = session.get(SegmentDb, sensor_in.segment_id)
@@ -47,6 +55,10 @@ def create_sensor(session: Session, sensor_in: SensorIn):
     session.refresh(new_sensor)
 
     return new_sensor
+
+# =================================================================================
+#    GET SENSOR BY ID
+# =================================================================================
 
 def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilter):
     sensor = session.get(SensorDb, sensor_id)
@@ -80,6 +92,10 @@ def get_sensor_by_id(session: Session, sensor_id: int, filters: MeasurementFilte
         measurements=measurements_out
     )
 
+# =================================================================================
+#    UPDATE SENSOR BY ID
+# =================================================================================
+
 def update_sensor_by_id(session: Session, sensor_id: int, sensor_update: SensorUpdate):
     sensor = session.get(SensorDb, sensor_id)
 
@@ -108,6 +124,10 @@ def update_sensor_by_id(session: Session, sensor_id: int, sensor_update: SensorU
     session.refresh(sensor)
     return sensor
 
+# =================================================================================
+#    DELETE SENSOR BY ID
+# =================================================================================
+
 def delete_sensor_by_id(session: Session, sensor_id: int):
     sensor = session.get(SensorDb, sensor_id)
 
@@ -119,6 +139,10 @@ def delete_sensor_by_id(session: Session, sensor_id: int):
     
     session.delete(sensor)
     session.commit()
+
+# =================================================================================
+#    GET SENSOR STATUS HISTORY BY ID
+# =================================================================================
 
 def get_sensor_status_history_by_id(session: Session, sensor_id: int, sensor_status: SensorStatus | None = None):
     sensor = session.get(SensorDb, sensor_id)
@@ -144,6 +168,10 @@ def get_sensor_status_history_by_id(session: Session, sensor_id: int, sensor_sta
         segment=sensor.segment,
         status_history=sensor_status_out,
     )
+
+# =================================================================================
+#    CHANGE SENSOR STATUS BY ID
+# =================================================================================
 
 def change_sensor_status_by_id(session: Session, sensor_id: int, sensor_status_update: SensorStatusUpdate):
     existing_sensor = session.get(SensorDb, sensor_id)
