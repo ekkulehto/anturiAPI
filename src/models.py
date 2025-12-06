@@ -5,7 +5,7 @@ from enum import Enum
 from pydantic import field_validator
 
 # =================================================================================
-#    Enumerables
+#    ENUMERABLES
 # =================================================================================
 
 class SensorStatus(str, Enum):
@@ -13,7 +13,7 @@ class SensorStatus(str, Enum):
     ERROR = "ERROR"
 
 # =================================================================================
-#    Sensor
+#    SENSORS
 # =================================================================================
 
 class SensorBase(SQLModel):
@@ -63,7 +63,7 @@ class SensorDb(SensorBase, table=True):
         )
 
 # =================================================================================
-#    Sensor status
+#    SENSOR STATUSES
 # =================================================================================
 
 class SensorStatusBase(SQLModel):
@@ -84,7 +84,7 @@ class SensorStatusDb(SensorStatusBase, table=True):
     sensor: Optional['SensorDb'] = Relationship(back_populates='status_history')
 
 # =================================================================================
-#    Measurements
+#    MEASUREMENTS
 # =================================================================================
 
 class MeasurementBase(SQLModel):
@@ -124,7 +124,7 @@ class MeasurementDb(MeasurementBase, table=True):
     value: float
 
 # =================================================================================
-#    Segments
+#    SEGMENTS
 # =================================================================================
 
 class SegmentBase(SQLModel):
