@@ -49,7 +49,7 @@ UPDATE_SENSOR_BY_ID_DESCRIPTION = (
 DELETE_SENSOR_BY_ID_SUMMARY = 'Delete a sensor by ID'
 DELETE_SENSOR_BY_ID_DESCRIPTION = (
     'Delete a sensor from the system by its unique ID. '
-    'This will also remove its measurements. '
+    "This will also remove it's measurements. "
     'Does not return any content, only the HTTP status code.'
 )
 
