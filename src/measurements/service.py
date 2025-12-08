@@ -56,43 +56,41 @@ def get_sensor_measurements_by_id(session: Session, sensor_id: int, filters: Mea
 #    CREATE NEW MEASUREMENT
 # =================================================================================
 
-def create_measurement(session: Session, measurement_in: MeasurementIn):
-    sensor = session.get(SensorDb, measurement_in.sensor_id)
+def create_measurement(session: Session, sensor_id: int, measurement_in: MeasurementIn):
+    sensor = session.get(SensorDb, sensor_id)
 
     if sensor is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail='Sensor not found.',
         )
 
     if sensor.status == SensorStatus.ERROR:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='Sensor is in ERROR state and must not send measurements.'
         )
     
-    payload = measurement_in.measurement
-
-    measurement = MeasurementDb(
-        sensor_id=measurement_in.sensor_id,
-        timestamp=payload.timestamp,
-        type=payload.type,
-        unit=payload.unit,
-        value=payload.value,
+    measurement_db = MeasurementDb(
+        sensor_id=sensor_id,
+        value=measurement_in.value,
+        unit=measurement_in.unit,
+        type=measurement_in.type,
+        timestamp=measurement_in.timestamp
     )
 
-    session.add(measurement)
+    session.add(measurement_db)
     session.commit()
-    session.refresh(measurement)
+    session.refresh(measurement_db)
 
     return MeasurementOutWithSensor(
-        sensor_id=measurement_in.sensor_id,
+        sensor_id=measurement_db.sensor_id,
         measurement=MeasurementOut(
-            id=measurement.id,
-            type=payload.type,
-            unit=payload.unit,
-            value=payload.value,
-            timestamp=payload.timestamp,
+            id=measurement_db.id,
+            value=measurement_db.value,
+            unit=measurement_db.unit,
+            type=measurement_db.type,
+            timestamp=measurement_db.timestamp,
         ),
     )
 
