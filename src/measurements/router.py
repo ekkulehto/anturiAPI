@@ -51,10 +51,11 @@ def get_sensor_by_id(
 )
 def create_measurement(
     *, 
-    session: Session = Depends(get_session), 
+    session: Session = Depends(get_session),
+    sensor_id: int = Path(..., description='Unique identifier of the sensor whose measurements to create'),  
     measurement_in: MeasurementIn
 ):
-    return crud.create_measurement(session, measurement_in)
+    return crud.create_measurement(session, sensor_id, measurement_in)
 
 # =================================================================================
 #    GET MEASUREMENT BY ID
