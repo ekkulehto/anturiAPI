@@ -1,170 +1,66 @@
-# Raportti – AnturiAPI
+## Miksi päädyin käyttämääni resursseihin
 
-## 1. Johdanto
+Lähdin liikkeelle aika selkeällä fiiliksellä siitä, mitä haluan rakentaa. Olin ennen tätä kurssia tehnyt tekoälyprojektin, jossa purin Hevy-kuntosalisovelluksen Swagger-dokumentaatiota ja kokeilin sen rajapintoja käsin. Siitä jäi tosi konkreettinen tuntuma siihen, miltä “mukava” API tuntuu – tai ainakin pitäisi tuntua – käyttäjän näkökulmasta: miten endpointit ketjuuntuvat, mitä tietoa on kätevä palauttaa ja miten Pydantic-tyyliset mallit istuvat siihen väliin.
 
-Tässä työssä toteutin **AnturiAPI:n**, joka on REST-rajapinta kuvitteellisen tehdashallin lämpötila-anturidatan keräämiseen ja hallintaan. API ei sisällä käyttöliittymää, vaan se on tarkoitettu toimimaan taustapalveluna esimerkiksi web- tai mobiilisovellukselle.
+Samaan aikaan tein IIoT-kurssin lopputyötä, jossa pyörittelin huomattavasti isompaa teollista kokonaisuutta ja sensorimaailmaa. Se oli tavallaan hyödyllistä taustaa, mutta ehkä enemmän haitaksi kuin hyödyksi tässä työssä, koska aloin alkuun suunnitella AnturiAPI:a aivan liian raskaana järjestelmänä. Jouduin monta kertaa muistuttamaan itseäni siitä, että nyt tehdään kurssityötä, ei kokonaista tehdasoperaatiojärjestelmää.
 
-Rajapinnan tavoitteena on:
-*   Vastaanottaa mittauksia antureilta.
-*   Hallita anturien tilaa ja niiden sijoittelua lohkoihin (segmentteihin).
-*   Tarjota riittävän monipuoliset datanäkymät käyttöliittymän tarpeisiin.
-*   Olla helposti laajennettavissa tulevaisuudessa (esim. uusia mittaustyyppejä, yksiköitä ja anturitiloja).
+Teknologioiden osalta päätin pysyä täysin siinä työkalupakissa, jonka kurssilla olimme jo ottaneet käyttöön: FastAPI, SQLModel ja SQLite. Ne riittivät kaikkeen mitä tehtävä vaati, enkä nähnyt mitään tarvetta ottaa mitään ylimääräistä mukaan. FastAPI antoi minulle automaattisesti hyvän Swagger-dokumentaation, SQLModel yhdisti järkevästi tietokantamallit ja skeemat, ja SQLite on helppo jakaa mukana ilman erillistä asennusta. Käytännössä näin pystyin keskittymään ihan rauhassa rakenteeseen ja logiikkaan, en ympäristöongelmiin.
 
----
+Koko projektin ajan minulla oli mielessä, että ratkaisua pitäisi olla mahdollista laajentaa tulevaisuudessa. Tästä syystä rakensin mittausmallin alusta asti siten, että käytössä on enum-tyypit mittaustyypille ja yksikölle (esimerkiksi `MeasurementType` ja `MeasurementUnit`) sekä erilliset kentät tyypille ja yksikölle. Nykyisessä versiossa mitataan vain lämpötilaa Celsius-asteina, mutta rakenne tukee sitä, että myöhemmin voidaan lisätä muitakin mittaustyyppejä ilman, että koko APIa tarvitsee repiä auki.
 
-## 2. Käytetyt resurssit ja tekniset valinnat
-
-### 2.1 Aiempi kokemus ja lähtökohta
-Minulla oli tehtävään pieni etulyöntiasema aiemman tekoälyprojektin ansiosta, jossa hyödynsin laajasti Hevy-kuntosalisovelluksen Swagger-dokumentaatiota ja sen API-kutsuja. Tuolloin opin:
-*   Miten Swaggerin interaktiivista dokumentaatiota käytetään tehokkaasti.
-*   Miten endpoint-kutsujen tekeminen on käytännössä sujuvinta.
-*   Kuinka Pydantic-malleja ja API-kutsuja on kätevä yhdistellä.
-
-Tämän ansiosta minulla oli heti alussa selkeä visio rakennettavasta API:sta ja tavoitellusta käyttökokemuksesta Swagger-dokumentaatiossa.
-
-### 2.2 Valitut kirjastot ja perustelut valinnoille
-Päädyin käyttämään kurssilla opeteltuja teknologioita, koska ne soveltuvat erinomaisesti juuri tämän tyyppiseen backend-projektiin:
-
-*   **FastAPI**
-    *   *Miksi:* Koska projektissa ei ole käyttöliittymää, FastAPIn automaattisesti generoima interaktiivinen dokumentaatio (Swagger UI) on korvaamaton työkalu testauksessa ja kehityksessä. Se myös nopeuttaa kehitystä verrattuna raskaampiin frameworkeihin.
-*   **SQLModel (Pydantic + SQLAlchemy)**
-    *   *Miksi:* Se mahdollistaa tietokantataulujen ja API-validointimallien määrittelyn samassa luokassa. Tämä vähentää koodin määrää (ei tarvitse ylläpitää erillisiä malleja tietokannalle ja APIlle) ja vähentää virheitä tyypityksessä.
-*   **SQLite**
-    *   *Miksi:* Tehtävänanto vaati relaatiotietokannan. SQLite on tähän tarkoitukseen paras valinta, koska se ei vaadi erillistä palvelinasennusta, vaan toimii tiedostona. Tämä tekee projektin tarkastamisesta ja siirtämisestä helppoa.
-
-Lisäksi hyödynsin Pythonin standardikirjastoa (mm. `datetime`) sekä FastAPIn työkaluja riippuvuuksien injektointiin (`Depends`) ja virheiden hallintaan (`HTTPException`).
-
-### 2.3 Projektin rakenne
-Projektin rakenne on jaettu selkeästi niin, että varsinainen lähdekoodi sijaitsee `src`-kansion alla. Juuressa ovat vain projektin hallintaan liittyvät tiedostot (kuten `requirements.txt`, `README.md` ja tietokanta `sensors.db`).
-
-Koodi on jaoteltu seuraavasti `src`-kansion sisällä:
-
-*   **Ydintiedostot:**
-    *   `main.py`: Sovelluksen käynnistys ja reitittimien (routers) yhdistäminen.
-    *   `database.py`: Tietokantayhteyden hallinta ja sessioiden luonti.
-    *   `models.py`: Kaikki keskeiset tietomallit (`SensorDb`, `SegmentDb`, `MeasurementDb`, enum-tyypit, ulostulomallit) on keskitetty tänne selkeyden vuoksi.
-
-*   **Moduulit (`measurements`, `segments`, `sensors`):**
-    Jokainen pääresurssi on omassa kansiossaan, joka sisältää:
-    *   `router.py`: Endpointien polut ja HTTP-pyyntöjen käsittely.
-    *   `service.py`: Liiketoimintalogiikka ja tietokantaoperaatiot.
-    *   `schemas.py`: Moduulikohtaiset apumallit (esim. suodatusluokat).
-    *   `docs.py`: Swagger-dokumentaation tekstikuvaukset (`summary`, `description`), jotta ne eivät tuki reititintiedostoa.
-
-Yritin aluksi pilkkoa myös `models.py`-tiedostoa pienempiin osiin, mutta se johti nopeasti hankaliin *circular import* -ongelmiin. Päädyin lopulta pitämään mallit yhdessä tiedostossa, mikä osoittautui selkeimmäksi ratkaisuksi. Muu logiikka on kuitenkin eriytetty omiin moduuleihinsa.
+Projektin alussa käytin kokonaisen päivän pelkästään `models.py`-tiedoston hiomiseen. Halusin ymmärtää kunnolla, miten sensorit, segmentit, mittaukset ja status-historia liittyvät toisiinsa, ennen kuin kirjoitan ensimmäistäkään oikeaa endpointia. Vasta kun mallit olivat mielestäni alustavasti järkevässä kunnossa, aloin rakentaa lopullista API:a niiden ympärille.
 
 ---
 
-## 3. Endpointien polkusuunnittelu
+## Mikä ohjasi endpointien polkusuunnittelua
 
-### 3.1 Pääresurssit
-Polut rakentuivat kolmen pääresurssin ympärille, mikä palvelee sekä backendin rakennetta että käyttöliittymän logiikkaa:
-1.  `/sensors` – Yksittäiset anturit, niiden tila ja historiat.
-2.  `/measurements` – Yksittäiset mittaukset.
-3.  `/segments` – Lohkot, joihin anturit kuuluvat.
+Alkuperäinen suunnitelma oli jakaa kaikki kolmeen koriin: `/segments`, `/sensors` ja `/measurements`. Tämä näytti paperilla siistiltä, mutta käytännössä alkoi tuntua sekavalta, kun yritin katsoa kokonaisuutta Swaggerin näkökulmasta. Aivan loppumetreillä päädyin siihen, että haluan korostaa sitä, että mittaukset ja tilat ovat anturin “alaresursseja”, mikä aiheutti vähän aikataulupaineita.
 
-### 3.2 Anturien polut
-*   `GET /sensors`: Listaa kaikki anturit (suodatus tilan perusteella).
-*   `POST /sensors`: Luo uuden anturin ja liittää sen segmenttiin.
-*   `GET /sensors/{sensor_id}`: Palauttaa anturin tiedot ja mittaukset.
-*   `PATCH /sensors/{sensor_id}`: Päivittää anturin nimeä ja/tai segmenttiä.
-*   `DELETE /sensors/{sensor_id}`: Poistaa anturin ja sen mittaukset.
-*   `GET /sensors/{sensor_id}/status_history`: Anturin tilamuutosten historia.
-*   `POST /sensors/{sensor_id}/status`: Vaihtaa anturin tilan.
+Siksi muutin kokonaisuuden lopussa muotoon:
 
-Liitin status-historian ja sen muuttamisen suoraan sensoriin, koska status on loogisesti anturin ominaisuus.
+- Segments  
+- Sensors  
+- Sensor Status  
+- Sensor Measurements  
 
-### 3.3 Mittausten polut
-*   `GET /measurements`: Listaa mittaukset (suodatus tyypin perusteella).
-*   `POST /measurements`: Lisää uuden mittauksen anturille.
-*   `GET /measurements/{measurement_id}`: Yksittäisen mittauksen haku.
-*   `DELETE /measurements/{measurement_id}`: Yksittäisen mittauksen poisto.
+Segmentit ovat ylempi taso, sensorit elävät siellä sisällä, ja sekä tilat että mittaukset ovat selkeästi yksittäisen sensorin alla. Tämä tuntui paljon luonnollisemmalta sekä dokumentaation että käyttöliittymän kannalta.
 
-Mittaukset ovat oma resurssinsa, mutta vahvasti kytköksissä anturiin. Luontipyyntö sisältää `sensor_id`:n ja sisäkkäisen `measurement`-objektin (arvo, yksikkö, tyyppi, aikaleima). Tämä rakenne mahdollistaa uusien mittaustyyppien lisäämisen ilman API:n perusrakenteen rikkomista.
+Tein myös tietoisesti ratkaisun, että sensorin perustiedot ja sensorin mittaushistoria eivät tule samasta endpointista. `GET /sensors/{sensor_id}` palauttaa vain perustiedot (id, nimi, segmentti, tila), ja varsinainen mittausdata (sekä sensorin perustiedot) haetaan erikseen `GET /sensors/{sensor_id}/measurements` -polulta, jossa sitä voi rajata limitillä ja aikavälillä. Tämä on pieni poikkeama tehtävänannosta, mutta tuntui oikeammalta mallilta, jos ajattelen käyttöliittymän tai muiden järjestelmien kannalta laajempaa tuotantokäyttöä.
 
-### 3.4 Segmenttien polut
-*   `GET /segments`: Listaa kaikki segmentit (ml. sensorien lukumäärä).
-*   `POST /segments`: Luo uuden segmentin.
-*   `GET /segments/{segment_id}`: Palauttaa segmentin, sen sensorit ja näiden mittaukset.
-*   `PATCH /segments/{segment_id}`: Päivittää segmentin nimen.
-*   `DELETE /segments/{segment_id}`: Poistaa segmentin (vain jos tyhjä).
+Segmenttinäkymä on tietoisesti hiukan rikkaampi. Siellä on tehtävänannon mukaisesti mukana myös sensoreiden viimeisin mittaus, jotta yhdellä haulla saa “tilannekuvan” lohkosta. Siihen lisäsin myös mahdollisuuden suodattaa segmentin anturit niiden `sensor_status`-arvon mukaan, jotta esimerkiksi segmentin virhetilassa olevat sensorit löytyvät helposti.
 
-`GET /segments/{segment_id}` toteutettiin vaatimuksia laajemmin: se mahdollistaa useamman mittauksen hakemisen, määrän rajaamisen sekä suodatuksen mittaustyypin ja aikavälin perusteella.
+Mittauspuolella tein ehkä kiistanalaisimman ratkaisun: yksittäisen mittauksen haku ja poisto tehdään polulla `/sensors/{sensor_id}/measurements/{measurement_id}`. Puhdas tietokanta ei tietenkään tarvitsisi sensorin id:tä, koska mittauksen id on jo yksilöllinen. Halusin kuitenkin polun, joka kertoo suoraan, minkä sensorin mittauksesta puhutaan, ja varmistaa samalla, ettei kukaan vahingossa poista tai käsittele “väärään sensoriin” kuuluvaa mittausta, jos järjestelmä tulevaisuudessa laajenisi. Tästä en ole vieläkään varma, onko se paras mahdollinen kompromissi, mutta se palveli tavoitettani korostaa mittausten kuulumista selkeästi tietylle sensorille. Mittauspuolelta löytyy myös lisäominaisuutena mahdollisuus suodattaa mittauksia niiden tyypin mukaan.
 
-### 3.5 DELETE- ja virhekäyttäytyminen
-REST-käytäntöjen mukaisesti `DELETE`-kutsut palauttavat statuskoodin **204 No Content** ilman bodya.
-
-Logiikkasääntöjä:
-*   Anturi virhetilassa (`ERROR`) ei saa lähettää mittauksia (API palauttaa virheen).
-*   Segmenttiä ei voi poistaa, jos siinä on sensoreita (API palauttaa 400 Bad Request).
+Kaiken taustalla oli ajatus siitä, että Swaggerin näkymä olisi ihmiselle luettava ja selkeä: ensin lohkot, sitten sensorit, ja niiden alla tila ja mittaukset. Halusin, että polut tukevat ja korostavat tätä hierarkiaa.
 
 ---
 
-## 4. Tietomallit ja laajennettavuus
+## Mitä opin työtä tehdessä
 
-### 4.1 Perusrakenne
-Tietokantamallit (`SQLModel`):
-*   `SensorDb`: Yksittäinen anturi.
-*   `SegmentDb`: Lohko, johon anturi kuuluu.
-*   `MeasurementDb`: Yksittäinen mittaustulos.
-*   `SensorStatusDb`: Anturin tilamuutosten historia (aikaleimoineen).
+Isoin oppi oli ehkä se, kuinka paljon suunnittelu etukäteen helpottaa kaikkea muuta. Kun käytin ensimmäisen päivän pelkästään mallien miettimiseen, se maksoi itsensä takaisin myöhemmin, vaikka jouduinkin refaktoroimaan rakennetta vielä ihan loppumetreilläkin.
 
-Erillinen `SensorStatusDb` osoittautui parhaaksi tavaksi toteuttaa luotettava status-historia.
+Toinen iso oppi liittyi siihen, miten helposti “ylisuunnittelu” vie mukanaan. Koska olin samaan aikaan miettimässä IIoT-järjestelmää, mieli karkasi koko ajan kohti valtavia tulevaisuuden laajennuksia. Huomasin, että lisäsin liikaa erilaisia paluu- ja näkymämalleja, suodattimia ja pieniä lisäominaisuuksia. Lopussa tämä kostautui: aikataulu alkoi painaa päälle ja jouduin palaamaan perusasioihin ja karsimaan turhaa monimutkaisuutta. Se oli hyvä muistutus siitä, että kaikkea mahdollista ei tarvitse tehdä yhdellä kertaa.
 
-### 4.2 Mittausmalli ja Enum-tyypit
-Mittaukset on suunniteltu laajennettaviksi.
-*   **Tietokanta (`MeasurementDb`):** `sensor_id`, `value`, `unit`, `type`, `timestamp`.
-*   **Enumit:** `MeasurementType` (esim. TEMPERATURE) ja `MeasurementUnit` (esim. CELSIUS).
-*   **API Payload:** Sisältää arvot, tyypin ja yksikön. Aikaleima on vapaaehtoinen; jos sitä ei anneta, palvelin luo sen.
+Opin myös käytännössä paljon SQLModelin ja relaatioiden käytöstä. Esimerkiksi kaskadipoistot, status-historian erottaminen omaksi taulukokseen ja se, miten eri ulostulomalleja kannattaa rakentaa samoista tietokantariveistä, tulivat tutuksi pikkuhiljaa – välillä virheiden ja debuggerin kautta. Eri ulostulomalleja tässä työssä riittää, koska minulla oli selkeä visio siitä, minkälaista dataa haluan ottaa sisään ja minkälaista dataa haluan antaa ulos. Päätöksiäni ohjasi monesti aikaisempi kuntosalisovelluksen kehitys, jossa hain yhdestä endpointista tietoa ja siinä olevia kenttiä käytin suoraan toiseen endpointtiin. Moni asia, jonka olin aiemmin nähnyt Hevyn APIsta generoidusta SDK:sta, muuttui tässä työssä “lihaksi luiden päälle”.
 
-### 4.3 Suodattimet ja haku
-Toteutin erilliset suodatinmallit hauille:
-*   **MeasurementFilterForGetSensorById:** Anturin mittausten rajaaminen (`limit`, `since`, `until`).
-*   **MeasurementFilterForGetSegmentById:** Segmentin datan rajaaminen (`limit`, `MeasurementType`, `since`, `until`).
+Yllättävän iso osa oppimista liittyi myös siihen, miten dokumentaatio ja API kulkevat käsi kädessä. Kun työstin Swagger-dokumentaatiota, huomasin helposti, mitkä ratkaisut olivat intuitiivisia ja mitkä selitystä vaativia. Jos jonkin endpointin joutui selittämään useiden vaiheiden kautta, se oli usein merkki siitä, että polkua tai rakennetta kannatti vielä hienosäätää.
 
-Tavoitteena oli, että API toimii ilman parametreja ("näytä kaikki"), mutta tarjoaa tarvittaessa tarkan suodatuksen.
+Jossakin vaiheessa projektia halusin myös refaktoroida sitä näiden oppien mukaisesti [FastAPI Best Practices](https://github.com/zhanymkanov/fastapi-best-practices) -ohjeiden suuntaan ja paloittelin projektin mielestäni melko modulaarisesti. Yritin myös pilkkoa `models.py`-tiedostoa useampaan pienempään osaan, mutta tämä aiheutti `circular import` -helvetin, joten päädyin käyttämään vain yhtä globaalia `models.py`-tiedostoa.
 
 ---
 
-## 5. Oppimiskokemukset
+## Keinoälyn käyttö
 
-### 5.1 Suunnittelu ennen koodausta
-Käytin ensimmäisen päivän `models.py`:n suunnitteluun. Tämä auttoi hahmottamaan relaatiot ja datavirrat (input vs. output) ennen koodauksen aloittamista, mikä säästi aikaa myöhemmin.
+Tekoäly oli mukana käytännössä koko projektin ajan, mutta ei niin, että olisin “tilannut valmiin ratkaisun”, vaan enemmänkin niin kuin olisi ollut kokenut kollega vieressä.
 
-### 5.2 Relaatiot ja SQLModel
-Opin projektin aikana paljon SQLModelin relaatioista:
-*   `Relationship`- ja `back_populates`-määrittelyjen käyttö.
-*   Ero tietokantamallien ja ulostulomallien välillä.
+Suunnitteluvaiheen tein pitkälti itse: suunnittelin mallit, hahmottelin relaatiot ja rakensin ensimmäisen version `models.py`-tiedostosta ilman tekoälyä. Sen jälkeen aloin käyttää ChatGPT:tä lähinnä peilinä: kysyin, onko jokin rakenne järkevä, onko jokin suhde turhan monimutkainen tai olisiko jokin malli syytä pilkkoa toisin. Monesti en ottanut ehdotuksia sellaisenaan, mutta keskustelut auttoivat kirkastamaan omaa näkemystäni.
 
-### 5.3 Sisäkkäiset mallit ja palautusarvot
-Suurin haaste liittyi sisäkkäisiin malleihin (esim. lista sensoreita, joilla on sisäkkäisiä mittauksia). Jouduin korjaamaan malleja ja kyselyitä useasti, mutta opin ymmärtämään `model_validate`-kutsujen tarpeen ja manuaalisten vastausmallien rakentamisen logiikan.
+Käytin tekoälyä myös konkreettisena “bugiapuna”: kun vastaan tuli outo virheilmoitus, typerä syntaksivirhe tai koodini ei vain yksinkertaisesti toiminut, oli nopeaa liittää pätkä terminaalista tai koodista keskusteluun ja pyytää, että “mikä tässä ei täsmää suhteessa siihen, mitä yritän tehdä”. Sama koski muutamia relaatiomallinnuksen ja varsinkin sisäkkäisten mallien yksityiskohtia, jotka eivät meinanneet jäädä päähän pelkän dokumentaation perusteella.
 
-### 5.4 Refaktorointi ja "Best Practices"
-Projektin loppuvaiheessa refaktoroin koodia *FastAPI Best Practices* -ohjeiden mukaiseksi. Tämä näkyy lopullisessa rakenteessa, jossa routerit, service-kerrokset ja dokumentaatiotiedostot on eriytetty moduuleittain (`src/measurements`, `src/segments` jne.).
+Halusin myös, että APIni Swagger-dokumentaatio on hyvin kirjoitettu, joten käytin tekoälyä generoimaan itselleni `summary`- ja `description`-tekstit, joita kylläkin itse sitten lopuksi muokkasin lopulliseen versioon. Nämä säilöin jokaisen osion omaan `docs`-tiedostoon, jotta itse koodipuoli ei menisi niin älyttömän tukkoon kattavasta dokumentaatiosta huolimatta.
 
-### 5.5 Yleinen fiilis
-Laajan API:n rakentaminen oli yllättävän suoraviivaista, kun peruspalikat olivat kunnossa. Suurin työmäärä kohdistui suunnitteluun, mallien yhteensovittamiseen ja dokumentaation hiomiseen.
+Dokumentaation puolella tekoäly auttoi erityisesti README- ja raporttitekstien jäsentelyssä. README-tiedostoon käytin enemmän hyväksi tekstin generointia koodikantani ja ohjeideni mukaisesti. Raportista generoin ensin “teknisen version” käyttäen tekoälyä ja omia kertomuksiani, josta sitten kirjoitin itse oman kömpelön versioni. Lopuksi annoin tekoälylle tämän raakatekstini, jonka jälkeen pyysin apua sen tiivistämiseen ja selkeyttämiseen. En kuitenkaan kopioinut mitään sokkona, vaan kävin kaikki tekstit läpi ja muokkasin niitä, jotta ne vastasivat varmasti omaa toteutustani ja ajatuksiani.
 
----
+Luottamus tekoälyn tuottamaan sisältöön syntyi kolmella tavalla: ensin tarkistin koodiin liittyvät ehdotukset ajamalla sovellusta ja testaamalla endpointteja Swaggerissa, toiseksi vertasin ratkaisuja FastAPIn ja SQLModelin dokumentaatioon, ja kolmanneksi arvioin, tuntuiko ehdotettu ratkaisu järkevältä tässä projektissa. Vasta kun nämä kolme kohtasivat, hyväksyin muutoksen osaksi lopullista versiota.
 
-## 6. Keinoälyn käyttö työssä
-
-Tässä projektissa käytin keinoälynä **ChatGPT 5.1**:tä. Käyttö oli avustavaa, ei koodin automaattista generointia alusta loppuun.
-
-### 6.1 Missä käytin keinoälyä
-*   **Suunnitteluvaihe:** Alkuperäinen visio syntyi ilman tekoälyä, mutta käytin sitä sparrailuapuna relaatiomallien (SensorDb, SegmentDb, jne.) selkeyttämisessä.
-*   **Virheenkorjaus:** Pyysin apua syntaksivirheiden ja "circular import" -ongelmien ratkaisemisessa.
-*   **Sisäkkäiset mallit:** Hyödynsin tekoälyä tietokantamallien ja API-vastausmallien välisten muunnosten (esim. `MeasurementDb` → `MeasurementOutWithSensor`) rakentamisessa.
-*   **Swagger-dokumentaatio:** Annoin tekoälyn muotoilla luonnoksia `summary`- ja `description`-teksteistä, jotka viimeistelin itse vastaamaan tarkasti toteutusta.
-*   **Dokumentaation puhtaaksikirjoitus:** Lopuksi käytin tekoälyä kirjoittamaan puhtaaksi `README.md`-tiedoston sekä tämän `RAPORTTI.md`-tiedoston (Gemini 3 Pro Preview).
-
-### 6.2 Miten varmistin, että tulos on oikea
-En luottanut vastauksiin sokeasti, vaan:
-*   Tarkistin ratkaisut FastAPI:n ja SQLModelin virallisesta dokumentaatiosta.
-*   Testasin API:a jatkuvasti paikallisesti ja Swaggerin kautta.
-*   Simuloin virhetilanteita (esim. poistoestot ja virheelliset syötteet).
-
-Ratkaisu todettiin valmiiksi vasta, kun koodi, dokumentaatio ja käytännön testit olivat linjassa.
-
-### 6.3 Miksi käytin keinoälyä
-Käytin tekoälyä kuten kokeneempaa kollegaa: nopeuttamaan virheiden löytämistä, tarjoamaan vaihtoehtoisia mallinnustapoja ja säästämään aikaa rutiininomaisessa tekstinmuotoilussa. Lopullinen vastuu ratkaisusta ja sen ymmärtämisestä on minulla.
+Lopputuloksena voin aika hyvällä omallatunnolla sanoa, että AnturiAPI on minun tekemäni ja ymmärrän sen jokaisen koodirivin toiminnon – tekoäly auttoi, kyseenalaisti ja nopeutti, mutta ei päättänyt puolestani. Myös pari sataa committia GitHubissa kertoo, että projektiin käytettiin aikaa ja vaivaa.
