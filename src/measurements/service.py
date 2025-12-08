@@ -28,6 +28,9 @@ def get_sensor_measurements_by_id(session: Session, sensor_id: int, filters: Mea
     
     query = select(MeasurementDb).where(MeasurementDb.sensor_id == sensor_id)
 
+    if filters.measurement_type is not None:
+        query = query.where(MeasurementDb.type == filters.measurement_type)
+        
     if filters.since is not None:
         query = query.where(MeasurementDb.timestamp >= filters.since)
     

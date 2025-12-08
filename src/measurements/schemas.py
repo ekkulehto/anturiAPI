@@ -1,7 +1,13 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
+from ..models import MeasurementType
+
 class MeasurementFilterForGetSensorById(BaseModel):
+    measurement_type: MeasurementType | None = Field(
+        default=None, 
+        description='Optional measurement type filter.'
+    )
     limit: int = Field(
         10, 
         gt=0, 
