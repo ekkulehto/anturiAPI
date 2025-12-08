@@ -80,10 +80,23 @@ def update_sensor_by_id(session: Session, sensor_id: int, sensor_update: SensorU
             detail='Sensor not found'
         )
     
-    if sensor_update.name is not None:
+    name_changed = (
+        sensor_update.name is not None
+        and sensor_update.name != sensor.name
+    )
+
+    segment_changed = (
+        sensor_update.segment_id is not None
+        and sensor_update.segment_id != sensor.segment_id
+    )
+
+    if not name_changed and not segment_changed:
+        return sensor
+    
+    if name_changed:
         sensor.name = sensor_update.name
     
-    if sensor_update.segment_id is not None:
+    if segment_changed:
         new_segment = session.get(SegmentDb, sensor_update.segment_id)
 
         if not new_segment:
