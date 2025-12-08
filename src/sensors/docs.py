@@ -25,11 +25,10 @@ CREATE_SENSOR_DESCRIPTION = '''
 #    GET SENSOR BY ID
 # =================================================================================
 
-GET_SENSOR_BY_ID_SUMMARY = 'Get a sensor with its measurements by ID'
+GET_SENSOR_BY_ID_SUMMARY = 'Get a sensor by ID'
 GET_SENSOR_BY_ID_DESCRIPTION = '''
 - Fetch a single sensor by its unique ID.
-- Include sensor details, the segment it belongs to, and its measurements.
-- Intended for inspecting one sensor in detail.
+- Include sensor details, and the segment it belongs to.
 '''
 
 # =================================================================================
