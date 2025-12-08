@@ -96,7 +96,7 @@ class SensorStatusDb(SensorStatusBase, table=True):
 class MeasurementBase(SQLModel):
     sensor_id: int
 
-class MeasurementPayload(SQLModel):
+class MeasurementIn(SQLModel):
     value: float
     unit: MeasurementUnit = Field(default=MeasurementUnit.CELSIUS)
     type: MeasurementType = Field(default=MeasurementType.TEMPERATURE)
@@ -106,9 +106,6 @@ class MeasurementPayload(SQLModel):
     @classmethod
     def round_value_to_one_decimal(cls, value: float) -> float:
         return round(value, 1)
-
-class MeasurementIn(MeasurementBase):
-    measurement: 'MeasurementPayload'
 
 class MeasurementOut(SQLModel):
     id: int
