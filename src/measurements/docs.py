@@ -12,7 +12,7 @@ GET_SENSOR_MEASUREMENTS_BY_ID_DESCRIPTION = '''
 #    CREATE NEW MEASUREMENT
 # =================================================================================
 
-CREATE_MEASUREMENT_SUMMARY = 'Create a new measurement'
+CREATE_MEASUREMENT_SUMMARY = 'Create a new measurement by sensor ID'
 CREATE_MEASUREMENT_DESCRIPTION = '''
 - Store a single measurement sent by a sensor.
 - Use the sensor ID to link the measurement to an existing sensor.
@@ -24,20 +24,19 @@ CREATE_MEASUREMENT_DESCRIPTION = '''
 #    GET MEASUREMENT BY ID
 # =================================================================================
 
-GET_MEASUREMENT_BY_ID_SUMMARY = 'Get a measurement by ID'
+GET_MEASUREMENT_BY_ID_SUMMARY = 'Get a single measurement by sensor ID and measurement ID'
 GET_MEASUREMENT_BY_ID_DESCRIPTION = '''
-- Fetch a single measurement using its unique ID.
+- Fetch a single measurement by sensor ID and measurement ID.
 - Return the measurement values and metadata.
-- Include the identifier of the sensor that produced the measurement.
 '''
 
 # =================================================================================
 #    DELETE MEASUREMENT BY ID
 # =================================================================================
 
-DELETE_MEASUREMENT_BY_ID_SUMMARY = 'Delete a measurement by ID'
+DELETE_MEASUREMENT_BY_ID_SUMMARY = 'Delete a single measurement by sensor ID and measurement ID'
 DELETE_MEASUREMENT_BY_ID_DESCRIPTION = '''
-- Delete a single measurement using its unique ID.
+- Delete a single measurement by sensor ID and measurement ID.
 - Permanently remove the measurement from the database.
 - Return only the HTTP status code, without a response body.
 '''
