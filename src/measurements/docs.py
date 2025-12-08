@@ -2,13 +2,11 @@
 #    GET ALL MEASUREMENTS
 # =================================================================================
 
-GET_ALL_MEASUREMENTS_SUMMARY = 'List all measurements'
-GET_ALL_MEASUREMENTS_DESCRIPTION = '''
-- Return all measurements stored in the system for all sensors.
-- Include the sensor identifier for each measurement.
-- Mainly intended for debugging, testing, or simple data views.
+GET_SENSOR_MEASUREMENTS_BY_ID_SUMMARY = 'List sensor measurements by ID'
+GET_SENSOR_MEASUREMENTS_BY_ID_DESCRIPTION = '''
+- Fetch a single sensor by its unique ID.
+- Include sensor details, the segment it belongs to, and its measurements.
 '''
-GET_ALL_MEASUREMENTS_TYPE_FILTER_DESCRIPTION = 'Optionally restrict results to a single measurement type. If omitted, measurements of all types are included.'
 
 # =================================================================================
 #    CREATE NEW MEASUREMENT
