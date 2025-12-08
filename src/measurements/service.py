@@ -1,41 +1,53 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
+from src.measurements.schemas import MeasurementFilterForGetSensorById
+
 from ..models import (
     MeasurementIn, 
     MeasurementDb, 
     MeasurementOut, 
     MeasurementOutWithSensor,
-    MeasurementType,
     SensorDb,
+    SensorOutWithMeasurements,
     SensorStatus
 )
 
 # =================================================================================
-#    GET ALL SEGMENTS
+#    GET SENSOR MEASUREMENTS BY ID
 # =================================================================================
 
-def get_all_measurements(session: Session, measurement_type: MeasurementType | None = None):
-    query = select(MeasurementDb)
+def get_sensor_measurements_by_id(session: Session, sensor_id: int, filters: MeasurementFilterForGetSensorById):
+    sensor = session.get(SensorDb, sensor_id)
 
-    if measurement_type is not None:
-        query = query.where(MeasurementDb.type == measurement_type)
-
-    measurements_db = session.exec(query).all()
-
-    return [
-        MeasurementOutWithSensor(
-            sensor_id=measurement.sensor_id,
-            measurement=MeasurementOut(
-                id=measurement.id,
-                type=measurement.type,
-                unit=measurement.unit,
-                value=measurement.value,
-                timestamp=measurement.timestamp
-            )
+    if not sensor:
+        raise HTTPException(
+            detail='Sensor not found',
+            status_code=status.HTTP_404_NOT_FOUND
         )
-        for measurement in measurements_db
-    ]
+    
+    query = select(MeasurementDb).where(MeasurementDb.sensor_id == sensor_id)
+
+    if filters.since is not None:
+        query = query.where(MeasurementDb.timestamp >= filters.since)
+    
+    if filters.until is not None:
+        query = query.where(MeasurementDb.timestamp <= filters.until)
+    
+    query = query.order_by(MeasurementDb.timestamp.desc())
+
+    query = query.limit(filters.limit)
+    
+    measurements_db = session.exec(query).all()
+    measurements_out = [MeasurementOut.model_validate(measurement) for measurement in measurements_db]
+
+    return SensorOutWithMeasurements(
+        id=sensor_id,
+        name=sensor.name,
+        status=sensor.status,
+        segment=sensor.segment,
+        measurements=measurements_out
+    )
 
 # =================================================================================
 #    CREATE NEW MEASUREMENT
