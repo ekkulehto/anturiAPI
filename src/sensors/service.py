@@ -1,15 +1,13 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from ..sensor_status.router import change_sensor_status_by_id
-from ..sensor_status.schemas import SensorStatusUpdate
-
 from .schemas import SensorUpdate
 from ..models import (
     SensorIn, 
     SensorDb,
     SensorStatus, 
-    SegmentDb, 
+    SegmentDb,
+    SensorStatusDb, 
 )
 
 # =================================================================================
@@ -34,20 +32,24 @@ def create_sensor(session: Session, sensor_in: SensorIn):
     if not segment:
         raise HTTPException(
             detail='Segment not found',
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND,
         )
     
     new_sensor = SensorDb.model_validate(sensor_in)
+
+    new_sensor.status = SensorStatus.NORMAL
+
     session.add(new_sensor)
     session.commit()
     session.refresh(new_sensor)
 
-    change_sensor_status_by_id(
-        session=session,
-        sensor_id=new_sensor.id,
-        sensor_status_update=SensorStatusUpdate(status=SensorStatus.NORMAL)
+    first_status = SensorStatusDb(
+        status=SensorStatus.NORMAL,
+        sensor=new_sensor,
     )
-
+    
+    session.add(first_status)
+    session.commit()
     session.refresh(new_sensor)
 
     return new_sensor
