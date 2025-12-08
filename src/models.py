@@ -42,11 +42,11 @@ class SensorOutWithMeasurements(SQLModel):
     segment: 'SegmentOut'
     measurements: list['MeasurementOut'] = Field(default_factory=list)
 
-class SensorOutInSegmentWithMeasurements(SQLModel):
+class SensorOutInSegmentWithLastMeasurement(SQLModel):
     id: int
     name: str
     status: SensorStatus
-    measurements: list['MeasurementOut'] = Field(default_factory=list)
+    last_measurement: Optional['MeasurementOut'] | None = None
 
 class SensorOutWithStatusHistory(SQLModel):
     id: int
@@ -151,7 +151,7 @@ class SegmentOutWithNumberOfSensors(SQLModel):
 class SegmentOutWithSensors(SQLModel):
     id: int
     name: str
-    sensors: list['SensorOutInSegmentWithMeasurements'] = Field(default_factory=list)
+    sensors: list['SensorOutInSegmentWithLastMeasurement'] = Field(default_factory=list)
 
 class SegmentDb(SegmentBase, table=True):
     id: int = Field(default=None, primary_key=True)
