@@ -27,8 +27,9 @@ CREATE_SEGMENT_DESCRIPTION = '''
 GET_SEGMENT_BY_ID_SUMMARY = 'Get a segment by ID'
 GET_SEGMENT_BY_ID_DESCRIPTION = '''
 - Return a single segment using its unique ID.
+- Optionally filter segment's sensors by their current state
 - Include all sensors that belong to the segment.
-- For each sensor, include its recent measurements.
+- For each sensor, include it's latest measurement if any.
 - Intended for viewing the state of one physical area at a glance.
 '''
 
