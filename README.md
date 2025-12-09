@@ -96,7 +96,7 @@ Kun olet avannut Swagger UI:n, voit testata API:n toimintaa esimerkiksi seuraava
 
    * `timestamp`-kentän voi jättää myös pois, jolloin palvelin luo sen automaattisesti.
 
-4 **Tarkastele Dataa**
+4. **Tarkastele Dataa**
 
    * `GET /sensors/1` – anturin perustiedot (nimi, lohko, tila).  
    * `GET /sensors/1/measurements` – anturin uusimmat mittaukset.  
