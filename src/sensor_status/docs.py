@@ -18,5 +18,5 @@ CHANGE_SENSOR_STATUS_BY_ID_SUMMARY = 'Change sensor status by ID'
 CHANGE_SENSOR_STATUS_BY_ID_DESCRIPTION = '''
 - Change the current status of a sensor.
 - Record each status change in the sensor status history with a timestamp.
-- Intended for external systems or operators to control sensor state.
+- Intended for the sensor, external systems or operators to control sensor state.
 '''
