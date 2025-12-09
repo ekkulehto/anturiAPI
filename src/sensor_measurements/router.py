@@ -2,10 +2,10 @@ from typing import Annotated
 from fastapi import APIRouter, Path, Query, status, Depends
 from sqlmodel import Session
 
-from ..measurements.schemas import MeasurementFilterForGetSensorById
+from ..sensor_measurements.schemas import MeasurementFilterForGetSensorById
 
 from ..database import get_session
-from ..measurements import service as crud
+from ..sensor_measurements import service as crud
 from ..models import MeasurementIn, MeasurementOutWithSensor, SensorOutWithMeasurements
 
 from .docs import (
