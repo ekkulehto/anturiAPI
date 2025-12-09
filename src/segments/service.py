@@ -110,7 +110,8 @@ def update_segment_by_id(session: Session, segment_id: int, segment_update: Segm
     if segment_update.name is None or segment_update.name == segment.name:
         return segment
     
-    session.add(segment)
+    segment.name = segment_update.name
+    
     session.commit()
     session.refresh(segment)
     return segment
