@@ -1,7 +1,6 @@
 # AnturiAPI
 
-AnturiAPI on REST-rajapinta kuvitteellisen tehdashallin lämpötila-anturidatan keräämiseen ja hallintaan.  
-API on suunniteltu toimimaan taustapalveluna erilliselle web- tai mobiilikäyttöliittymälle.
+AnturiAPI on REST-rajapinta kuvitteellisen tehdashallin lämpötila-anturidatan keräämiseen ja hallintaan. API on suunniteltu toimimaan taustapalveluna erilliselle web- tai mobiilikäyttöliittymälle.
 
 Nykyisessä versiossa anturit mittaavat vain lämpötilaa, mutta rajapinta on suunniteltavissa laajennettavaksi myös muille mittaustyypeille. Tiedonsiirrossa käytetään JSON-muotoisia viestejä ja relaatiotietokantana toimii SQLite.
 
@@ -112,7 +111,8 @@ Swagger-dokumentaatiossa resurssit näkyvät seuraavassa järjestyksessä:
 1. **Segments**  
 2. **Sensors**  
 3. **Sensor Status**  
-4. **Sensor Measurements**
+4. **Sensor Measurements**  
+5. **Measurements**
 
 ### 1. Segments (Lohkot)
 
@@ -210,7 +210,7 @@ Anturin tilamuutokset (`NORMAL`, `ERROR`) mallinnetaan erillisenä resurssina.
 
 ### 4. Sensor Measurements (Mittaukset anturikohtaisesti)
 
-Mittaukset käsitellään aina anturin aliresurssina. Mittausarvot pyöristetään automaattisesti yhteen desimaaliin tallennuksen yhteydessä.
+Mittaukset käsitellään anturin aliresurssina silloin, kun halutaan tarkastella tai lisätä mittauksia nimenomaan tietylle sensorille. Mittausarvot pyöristetään automaattisesti yhteen desimaaliin tallennuksen yhteydessä.
 
 * `GET /sensors/{sensor_id}/measurements`  
   Listaa anturin mittaukset.  
@@ -239,14 +239,19 @@ Mittaukset käsitellään aina anturin aliresurssina. Mittausarvot pyöristetä�
   * Jos sensori on tilassa `ERROR`, mittaus hylätään ja palvelin palauttaa virheen.  
     Toisin sanoen virhetilassa oleva sensori **ei voi** lähettää mittauksia, ja tämä on estetty myös palvelinpäässä.
 
-* `GET /sensors/{sensor_id}/measurements/{measurement_id}`  
-  Hakee yksittäisen mittauksen tiedot.  
-  Endpoint tarkistaa, että mittaus kuuluu annetulle sensorille – jos mittausta ei löydy tai se ei kuulu sensorille, palautetaan virhe (404).  
-  Vastauksessa palautetaan sekä `sensor_id` että mittauksen tiedot (`MeasurementOutWithSensor`-malli).
+---
 
-* `DELETE /sensors/{sensor_id}/measurements/{measurement_id}`  
+### 5. Measurements (Yksittäiset mittaukset)
+
+Measurements-resurssi tarjoaa tavan käsitellä yksittäisiä mittauksia niiden globaalin tunnisteen (`measurement_id`) perusteella riippumatta siitä, miltä sensorilta mittaus on tullut.
+
+* `GET /measurements/{measurement_id}`  
+  Hakee yksittäisen mittauksen tiedot `measurement_id`-arvon perusteella.  
+  Palauttaa mittauksen peruskentät (`MeasurementOut`), kuten arvon, tyypin, yksikön ja aikaleiman.
+
+* `DELETE /measurements/{measurement_id}`  
   Poistaa yksittäisen mittauksen (esimerkiksi virheellisen datan siivoaminen).  
-  Jos mittausta ei ole tai se ei kuulu sensorille, palautetaan virhe (404).
+  Jos mittausta ei löydy, palautetaan virhe (404).
 
 ---
 
@@ -419,4 +424,4 @@ Yhdessä nämä mallit muodostavat johdonmukaisen kokonaisuuden, jossa:
 * Segmentit ryhmittelevät sensoreita  
 * Sensorit kuuluvat segmentteihin ja tuottavat mittauksia  
 * Sensorien tilat ja tilahistoria tallentuvat erilliseen tauluun  
-* Mittaukset ovat aina sidottuja tiettyyn sensoriin, ja virhetilassa (`ERROR`) oleva sensori ei voi lähettää uusia mittauksia.
+* Mittaukset ja tilahistoria ovat aina sidottuja tiettyyn sensoriin
